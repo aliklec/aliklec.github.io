@@ -1,3 +1,3 @@
 var test = document.createElement("div");
-test.innerHTML = "DOMtest";
+test.innerHTML = "test";
 document.body.appendChild(test);
