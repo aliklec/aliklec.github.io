@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--sidebar-w:290px;--teal-dark:#0d3b3e;--teal-mid:#145456;--teal-accent:#1a8a7d;--teal-light:#2ec4b6;--bg:#f4f5f7;--card-bg:#ffffff;--text-pri:#111118;--text-sec:#2e2e3a;--text-muted:#555566;--border:#e4e4ec;--radius:14px;--tr:0.3s cubic-bezier(0.4,0,0.2,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri);display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);min-height:100vh;position:fixed;left:0;top:0;background:linear-gradient(175deg,#1a6163 0%,#1e7b78 60%,#1a6b68 100%);display:flex;flex-direction:column;align-items:center;padding:52px 28px 40px;z-index:100}
+.sidebar::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 30% 85%,rgba(46,196,178,0.1) 0%,transparent 50%),radial-gradient(circle at 80% 15%,rgba(26,138,125,0.08) 0%,transparent 40%)}
+.avatar-ring{width:150px;height:150px;border-radius:50%;padding:3.5px;margin-bottom:24px;background:linear-gradient(135deg,var(--teal-light),var(--teal-accent));animation:fadeIn .6s ease-out;position:relative}
+.avatar{width:100%;height:100%;border-radius:50%;background:var(--teal-dark);display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:'Playfair Display',serif;font-size:44px;font-weight:600;color:var(--teal-light)}
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.sb-name{font-family:'Playfair Display',serif;font-size:21px;font-weight:600;color:#fff;text-align:center;margin-bottom:4px;animation:fadeIn .6s .1s ease-out both}
+.sb-title{font-size:11.5px;font-weight:500;color:rgba(255,255,255,0.85);text-align:center;letter-spacing:2px;text-transform:uppercase;margin-bottom:36px;animation:fadeIn .6s .15s ease-out both}
+.sb-divider{width:44px;height:1px;background:rgba(255,255,255,0.12);margin-bottom:32px;animation:fadeIn .6s .2s ease-out both}
+.contact-section{width:100%;animation:fadeIn .6s .25s ease-out both}
+.contact-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:16px}
+.contact-item{display:flex;align-items:center;gap:12px;padding:9px 0;color:#ffffff;font-size:13px;text-decoration:none;transition:color var(--tr)}
+.contact-item:hover{color:var(--teal-light)}
+.contact-item svg{width:16px;height:16px;flex-shrink:0;opacity:1}
+.main{margin-left:var(--sidebar-w);flex:1;padding:0}
+.topnav{position:sticky;top:0;z-index:50;background:rgba(244,245,247,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 56px;display:flex;align-items:center;height:64px}
+.tab{position:relative;padding:20px 0;margin-right:36px;font-size:14px;font-weight:500;color:var(--text-muted);cursor:pointer;transition:color var(--tr);letter-spacing:0.3px;background:none;border:none;font-family:inherit}
+.tab:hover{color:var(--text-pri)}
+.tab.active{color:var(--text-pri);font-weight:600}
+.tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;background:var(--teal-accent);border-radius:2px 2px 0 0}
+.content{padding:48px 56px 72px}
+.page{display:none;animation:fadeUp .45s ease-out}
+.page.active{display:block}
+.section-header{margin-bottom:36px}
+.section-header h1{font-family:'Playfair Display',serif;font-size:32px;font-weight:600;margin-bottom:6px}
+.section-header p{font-size:16px;color:var(--text-sec);line-height:1.6}
+.project-grid{display:flex;flex-direction:column;gap:20px;max-width:720px}
+.project-card{background:#c8e6e2;border-radius:var(--radius);overflow:hidden;border:1px solid #b0d8d3;transition:all var(--tr);cursor:pointer;padding:28px 36px}
+.project-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.08);border-color:transparent}
+.project-body h3{font-size:19px;font-weight:600;margin-bottom:8px}
+.project-body p{font-size:15px;color:var(--text-sec);line-height:1.65;margin-bottom:16px}
+.project-techs{display:flex;flex-wrap:wrap;gap:6px}
+.tech-pill{padding:4px 10px;border-radius:6px;font-size:13px;font-weight:500;background:rgba(255,255,255,0.7);color:var(--text-sec)}
+.back-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;background:#e4e4e9;border:none;color:var(--text-sec);font-size:13px;font-weight:500;cursor:pointer;transition:all var(--tr);margin-bottom:32px;font-family:inherit}
+.back-btn:hover{background:#d5d5dc;}
+
+
+.detail-hero{height:100px;border-radius:var(--radius);margin-bottom:36px;display:flex;align-items:center;position:relative;overflow:hidden;background:#c8e6e2;max-width:740px;padding-left:36px}
+
+.detail-hero.p1{background:#c8e6e2}
+.detail-hero.p2{background:#c8e6e2}
+.detail-hero h2{font-family:'Playfair Display',serif;font-size:30px;color:var(--teal-dark);font-weight:600;z-index:1}
+.detail-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(255,255,255,0.08),transparent 60%)}
+.detail-content{max-width:740px}
+.detail-content h3{font-size:20px;font-weight:600;margin:28px 0 12px}
+.detail-content p{font-size:15.5px;color:var(--text-sec);line-height:1.75;margin-bottom:16px}
+.detail-content ul{padding-left:20px;margin-bottom:16px}
+.detail-content li{font-size:15px;color:var(--text-sec);line-height:1.8}
+.detail-content pre{background:#e4e4e9;color:#111118;border-radius:10px;padding:20px 24px;margin:16px 0 20px;overflow-x:auto;font-size:13px;line-height:1.7}
+.detail-content code{font-family:'DM Mono',monospace,Consolas,'Courier New';font-size:13px}
+.detail-content pre .kw{color:#7c3aed}
+.detail-content pre .fn{color:#2563eb}
+.detail-content pre .st{color:#16a34a}
+.detail-content pre .cm{color:#8e8ea0}
+.detail-content pre .nb{color:#d97706}
+.detail-content pre .op{color:#64748b}
+
+.detail-content table{border-collapse:collapse;width:100%;margin-bottom:16px}
+.detail-content th,.detail-content td{border:1px solid var(--border);padding:10px 20px;text-align:center;font-size:15px;color:var(--text-sec)}
+.detail-content th{background:#e4e4e9;font-weight:600}
+
+
+.detail-links{display:flex;gap:12px;margin-top:32px}
+.detail-link{padding:10px 22px;border-radius:8px;font-size:13.5px;font-weight:600;text-decoration:none;transition:all var(--tr);font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:8px;border:none}
+.detail-link.primary{background:var(--teal-accent);color:#fff}
+.detail-link.primary:hover{background:var(--teal-dark)}
+.detail-link.secondary{background:#e4e4e9;border:none;color:var(--text-sec)}
+.detail-link.secondary:hover{background:#d5d5dc}
+.resume-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;max-width:900px}
+.resume-block{margin-bottom:36px}
+.resume-block-title{font-size:15px;font-weight:600;color:var(--teal-accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.resume-entry{position:relative;padding:12px 0;margin-bottom:4px}
+.resume-entry:last-child{}
+.resume-entry h4{font-size:17px;font-weight:600;margin-bottom:2px}
+.resume-entry .re-sub{font-size:15px;color:var(--teal-accent);font-weight:500;margin-bottom:2px}
+.resume-entry .re-date{font-size:14.5px;color:var(--text-muted);margin-bottom:6px}
+.resume-entry p{font-size:15.5px;color:var(--text-sec);line-height:1.6}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:900px){
+.sidebar{width:100%;min-height:auto;position:relative;padding:32px 24px;flex-direction:column;align-items:center;gap:4px}
+.main{margin-left:0}body{flex-direction:column}
+.avatar-ring{width:100px;height:100px;margin-bottom:16px}.avatar{font-size:30px}
+.sb-name{font-size:19px}
+.sb-title{margin-bottom:16px;font-size:10.5px}
+.sb-divider{display:none}
+.contact-section{text-align:center;width:auto}
+.contact-item{justify-content:center;padding:8px 0;font-size:14px}
+.contact-item svg{width:18px;height:18px}
+.content{padding:28px 20px}
+.resume-grid{grid-template-columns:1fr}
+.project-grid{grid-template-columns:1fr}
+.topnav{padding:0 20px;height:56px}
+.tab{font-size:15px;margin-right:28px;padding:16px 0}
+.section-header h1{font-size:26px}
+.section-header p{font-size:15px}
+.project-card{padding:24px}
+.project-body h3{font-size:17px}
+.project-body p{font-size:14px}
+.detail-hero{height:80px;border-radius:10px}
+.detail-hero h2{font-size:22px}
+.detail-content h3{font-size:18px}
+.detail-content p{font-size:14.5px}
+.detail-content pre{padding:16px;font-size:12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.detail-links{flex-wrap:wrap}
+.detail-link{font-size:13px;padding:10px 18px}
+.back-btn{font-size:13px}
+.resume-block-title{font-size:14px}
+.resume-entry h4{font-size:16px}
+.resume-entry .re-sub{font-size:14px}
+.resume-entry .re-date{font-size:13.5px}
+.resume-entry p{font-size:14.5px}
+}
+@media(max-width:480px){
+.sidebar{padding:28px 20px}
+.avatar-ring{width:88px;height:88px}.avatar{font-size:26px}
+.sb-name{font-size:18px}
+.content{padding:24px 16px}
+.topnav{padding:0 16px}
+.tab{margin-right:24px;font-size:14px}
+.section-header h1{font-size:23px}
+.project-card{padding:20px}
+.detail-hero{height:70px}
+.detail-hero h2{font-size:20px}
+.detail-content pre{padding:14px 12px;font-size:11.5px}
+.resume-grid{gap:24px}
+}
+</style>
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  var tabId = id;
+  if (id === 'project1' || id === 'project2') tabId = 'portfolio';
+  document.querySelectorAll('.tab').forEach(function(t) {
+    t.classList.remove('active');
+    if (t.getAttribute('data-page') === tabId) t.classList.add('active');
+  });
+  var target = document.getElementById('page-' + id);
+  if (target) {
+    target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+</script>
+</head>
+<body>
+
+<aside class="sidebar">
+<div class="avatar-ring">
+  <img class="avatar" src="C:\Users\aklec\Downloads\website\photo.jpeg" alt="Profile photo">
+</div>
+  <div class="sb-name">Alison Kleczewski</div>
+  <div class="sb-title">
+    <p>&nbsp;</p>
+    <p>Experience Localization Project Manager</p>
+    <p>&nbsp;</p>
+    <p>M.S. in Human Language Technology&nbsp;</p>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="contact-section">
+    <a class="contact-item" href="https://forms.google.com/YOUR-FORM-LINK-HERE" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
+      Contact
+    </a>
+    <div class="contact-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Tucson, CA
+    </div>
+    <a class="contact-item" href="https://github.com/aliklec" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58v-2.17c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.85 1.24 1.85 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 016.02 0c2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58A12.01 12.01 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+    github.com/aliklec
+  </a>
+    <a class="contact-item" href="https://www.linkedin.com/in/alisonkleczewski/" target="_blank">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 11-.01-4.13 2.06 2.06 0 01.01 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      linkedin.com/in/alisonkleczewski/
+    </a>
+  </div>
+</aside>
+
+<div class="main">
+  <nav class="topnav">
+    <button class="tab active" data-page="portfolio" onclick="showPage('portfolio')">Portfolio</button>
+    <button class="tab" data-page="resume" onclick="showPage('resume')">Resume</button>
+  </nav>
+  <div class="content">
+
+    <!-- PORTFOLIO -->
+    <div class="page active" id="page-portfolio">
+      <div class="section-header">
+        <h1>Selected Projects</h1>
+      </div>
+      <div class="project-grid">
+        <div class="project-card" onclick="showPage('project1')">
+          <div class="project-body">
+            <h3>Fine-Tuning ASR Models for Low-Resource Languages</h3>
+            <p>As an intern at XRI Global, I helped fine-tune automatic speech recognition models on low-resource language to improve their performance. I also worked on benchmarking models and tracking performance metrics like word error rate and character error rate.&nbsp; &nbsp;&nbsp;</p>
+            <div class="project-techs">
+				  <span class="tech-pill">PyTorch</span>
+				  <span class="tech-pill">Hugging Face</span>
+				  <span class="tech-pill">Seq2Seq</span>
+            </div>
+          </div>
+        </div>
+        <div class="project-card" onclick="showPage('project2')">
+          <div class="project-body">
+            <h3>Move Review Sentiment Classifier</h3>
+            <p>Developed a sentiment classifier for movie reviews using TF-IDF feature extraction and logistic regression, achieving an F1 score of&nbsp;0.93.&nbsp; The classifier distinguishes between three categories: non-movie reviews, positive reviews, and negative reviews by leveraging n-grams and SelectKBest feature selection.</p>
+            <div class="project-techs">
+              <span class="tech-pill">Scikit-learn</span>
+              <span class="tech-pill">NLTK</span>
+              <span class="tech-pill">Pandas</span>
+              <span class="tech-pill">NumPy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- PROJECT 1 -->
+<div class="page" id="page-project1">
+  <button class="back-btn" onclick="showPage('portfolio')">&#8592; Back to Portfolio</button>
+  <div class="detail-hero p1"><h2>Fine-Tuning ASR Models for Low-Resource Languages</h2></div>
+  <div class="detail-content" id="project1-content"></div>
+</div>
+
+
+<!-- PROJECT 2 -->
+<div class="page" id="page-project2">
+  <button class="back-btn" onclick="showPage('portfolio')">&#8592; Back to Portfolio</button>
+  <div class="detail-hero p2"><h2>Movie Review Sentiment Classifier</h2></div>
+  <div class="detail-content" id="project2-content"></div>
+</div>
+
+<!-- +++++++++++++++++++++++MARKDOWN PROJECT 1+++++++++++++++++++++++++++++++++ -->
+<script type="text/markdown" id="project1-md">
+## ASR Model Fine-Tuning
+
+Coming soon!
+
+</script>
+
+<!-- +++++++++++++++++++++++MARKDOWN PROJECT 2+++++++++++++++++++++++++++++++++ -->
+<script type="text/markdown" id="project2-md">
+
+## Task
+<br />
+The dataset for this project contains reviews which fall into 3 categories:
+
+- Not a movie or TV show review (label 0)
+- Positive movie or TV show review (label 1)
+- Negative movie or TV show review (label 2)
+
+There are two files in CSV format--one containing training data and one containing test data. The training file contains three columns: ID, review, and label. The test file contains two columns: ID and review.  The goal was to develop and train a classification model using the labeled data from the training file, in order to then accurately predict which of the three categories each test review should fall into.
+<br />
+## Approach
+<br />
+For my first attempt, I created my own custom features and trained a logistic regression model on them. First, I preprocessed the data by replacing NaN items with an empty string, removing certain punctuation I thought would not be relevant for sentiment, making everything lowercase, and getting rid of newline characters and HTML line break tags. Then I came up with some features I felt would signal the categories of the reviews. I used DictVectorizer to transform them into matrices, and then trained a logistic regression model on them. I created various custom features along these lines:
+
+```Python
+{
+'sentiment_score':  sentiment_score, #sentiment score from NLTK SentimentIntensityAnalyzer
+'exclamation_count': text.count('!'),
+'review_length': len(text.split()),
+'movie_tv_words': 1  if re.search(r'(movie|film|episode|watch)', text) else  0, 
+'non_movie_words': 1  if re.search(r'(book|author|novel|read|composer)', text) else  0, 
+'contains_positive': 1  if re.search(r'(incredible|brilliant|masterpiece|excellent|good|great|love)', text) else  0, 
+'contains_negative': 1  if re.search(r'(dull|boring|stupid|terrible|awful|dumb|horrible|bad|waste|yawn|hated)', text) else  0
+}
+```
+
+The goal was a customizable setup in which I could define and control the features precisely. However, based on my relatively small set of custom features in this draft setup, my initial Kaggle submission resulted in an accuracy score of around 77% percent. While I still think this approach could be promising with enough custom features, it would have been extremely time-consuming and manual. The training set has about 70,000 reviews, so coming up with a strong and comprehensive list of custom features to cover the many different ways of expressing sentiment would have been difficult. I still like the idea behind this approach, since it offers the ability to carefully control the features. If I were to continue with it, I would develop a larger set of features, and possibly consider alternatives like a count-based method instead of a binary one. However, I decided to shift gears and try a model involving less manual work.
+
+After considering more efficient methods to come up with features, I settled on using scikit-learn's TF-IDF vectorizer. This is a useful strategy for various reasons:
+
+ - It can be done automatically by sci-kit learn using different ngram counts (no need to come up with features manually)
+ - It is considered a good "go to" baseline (Jurafsky & Martin, [_Speech and Language Processing_](https://web.stanford.edu/~jurafsky/slp3/ed3bookfeb3_2024.pdf), p. 117)
+ - An advantage of TF-IDF (Term Frequency-Inverse Document Frequency) over raw counts is that TF-IDF reduces the importance of words that appear frequently across all documents (and are therefore unlikely to help distinguish classes). TF-IDF not only effectively filters out stop words but also diminishes the impact of other non-discriminative words. This is particularly useful given the large number of reviews in the dataset--it would take a long time to sift through and try to figure out which words do not help differentiate between classes.
+
+Having settled on TF-IDF for feature extraction, I decided I would continue using logistic regression for training, since this worked well for a previous spam classifier experiment I tested, and would integrate easily with TF-IDF. I also refined my code in other ways to ensure a more successful model. For my second attempt, I implemented an 80%/20% (training and development) split of the data to help catch issues like overfitting and to test how my model would generalize to unseen data.
+
+I set up the new model with some basic parameters, sticking mostly with the defaults as a starting point. I chose to start with a 1-3 ngram range as I thought this might capture at least some types of negation and more complex sentiment phrases (e.g. "do not watch" / "good acting but"). Right away, this model was a big improvement over the previous one, giving me a weighted F1 score on my development data of around 90%, so I decided to stick with this approach and further refine it.
+
+As a next step, I experimented with different parameters and explored other ways to improve my F1 score. I explored more preprocessing steps like removing stop words, lemmatizing (using NLTK WordNetLemmatizer), and replacing words like "film", "flick", and "movies" with "movie" (and doing something similar for TV show-related words). Interestingly, these various preprocessing steps tended to lower my F1 score by a marginal amount (around 0.4% - 0.5% depending on various factors) as compared to the default tokenizer and preprocessor steps in scikit-learn TF-IDF. According to the [scikit-learn documentation](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html), the default token pattern used is  _'(?u)\b\w\w+\b'_ and punctuation is ignored and treated as a separator. I decided to stick with these defaults since my additional preprocessing steps did not improve my F1 score and even lowered it in some cases. It is possible the stop word removal did not help because TF-IDF essentially takes care of this, or because the particular words being removed could be meaningful for sentiment analysis (e.g. negation terms like "not"). I would guess that the lack of improvement using lemmas could have to do with the reviews having a lot of informal language and slang which are not effectively lemmatized. It was unclear to me why having more variation of terms like "movie", "film", etc. made for a better model, which I'd like to investigate further at some point.
+
+Another thing I noticed while testing my model, was that the unigram and bigram "br" and "br br" (from HTML line break tags) would come in as top coefficients for classes 1 and 2 if not removed during preprocessing. I had thought these tokens would act as noise that would negatively impact the accuracy, but when I used a token pattern or preprocessor to remove those, it actually made the F1 score marginally worse (by about 0.35%, depending on the version of my model). This seemed counterintuitive and I'm still unsure about the cause. It's possible the line breaks occur in certain types of reviews more often and might actually correlate with the classes in a meaningful way. Otherwise, it could be that my model is overfitting to the training data and leaving the "br" features will work against me in the final test run. However, I chose to leave them given the higher F1 score for my development data.
+
+After settling on the scikit-learn preprocessing defaults, the next step was fine-tune the parameters to see how much I could improve my accuracy and found that an efficient way to do this would be to use scikit-learn's [GridSearchCV](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html) method (explained further [here](https://www.analyticsvidhya.com/blog/2021/06/tune-hyperparameters-with-gridsearchcv/#h-what-is-gridsearchcv)). This presented some new challenges because many combinations of parameters were not feasible to test in a reasonable amount of time. However, it proved to be useful overall if I limited my search to just a few select parameter comparisons.
+
+After a lot of experimenting, I started to zero in on some effective parameters. For TF-IDF, I found that a minimum document frequency of 3 and a maximum document frequency of 70% worked well. Limiting the most rare and most common ngrams seemed to help the model focus on what was important. Logarithmic scaling with "sublinear_tf=True" improved the model, as did lowercasing, using a binary representation, and leaving the default L2 norm. With respect to ngrams, I found that ranges between 1-3 and 1-5 were most accurate for my model. Smaller ranges likely did not capture enough complexity and larger ranges probably led to overfitting. For logistic regression parameters, I found that regularization with a C value between 5 to 20 worked best (depending on other various parameters). It was interesting to see how changing the C value impacted the training and development accuracy. Increasing C gave me increasingly good accuracy results for the training data, but at a certain point the development data would stop improving, signaling that the model was overfitting. Through various adjustments and testing with GridSearchCV, I also found that the Stochastic Average Gradient Augmented ('saga') solver, a balanced class weight, and the default L2 penalty worked well for my model.
+
+After I felt I had reached a peak in terms of significant F1 improvements from adjusting TF-IDF and logistic regression parameters, I was curious about what other methods could improve my score. In researching techniques, I came across scikit-learn's "[SelectKBest](https://scikit-learn.org/stable/modules/feature_selection.html#univariate-feature-selection)" method (discussed further [here](https://medium.com/@Kavya2099/optimizing-performance-selectkbest-for-efficient-feature-selection-in-machine-learning-3b635905ed48#098d)) . Using statistical tests to measure dependence between variables (i.e. features as independent variables and classes as dependent variables), SelectKBest can help identify the most relevant features from the data, which can improve the performance of the model and reduce overfitting. My TF-IDF model with 1-5 ngrams originally contained 1,050,400 features! After playing around with different K values using the chi-squared test, I found that 215,000 seemed to be the sweet spot for improving my F1 score. With SelectKBest implemented, I was able to get an F1 score around 0.9458 for my development data. While it felt like I could have fiddled around endlessly, testing more feature extraction methods, training techniques, and parameters, I decided this F1 score was satisfactory.
+
+Here is the final approach I ended up with:
+- Load the data using Pandas and replace missing values with an empty string using the "fillna" function
+- Use TF-IDF Vectorizer from scikit-learn to convert text data into TF-IDF features
+- Use SelectKBest with the chi-squared test to select the top K most significant features
+- Train a logistic regression model on these features and use it to make predictions on the test data
+
+*See GitHub link under the "Code" section below to see the specific parameters used.
+<br />
+## Results
+
+<br />
+
+With my final approach of TF-IDF for feature extraction, pruning with SelectKBest, and using logistic regression for training, I ended up with an F1 score of 0.9458 for my development data. This translated to a 0.92526 F1 score on Kaggle for the initial run with 80% of the test data, and it will be interesting to see how much it changes with the remaining 20% of the test data.
+
+The confusion matrix for my development data gave the following results:
+
+|            | Predicted 0 | Predicted 1 | Predicted 2 |
+|------------|-------------|-------------|-------------|
+| **Actual 0** | 6369        | 47          | 38          |
+| **Actual 1** | 112         | 3523        | 221         |
+| **Actual 2** | 61          | 281         | 3412        |
+
+F1 scores per class were as follows:
+-   **Class 0**: 0.9801
+-   **Class 1**: 0.9142
+-   **Class 2**: 0.9191
+
+<br />
+
+## Code
+
+<br>
+
+The code is at the link here: [https://github.com/uazhlt-ms-program/grad-level-term-project-kaggle-competition-aliklec](https://github.com/uazhlt-ms-program/grad-level-term-project-kaggle-competition-aliklec)
+
+**How to run the code:**
+1. Download or clone the Jupyter notebook "ReviewClassifier.ipynb" from the [GitHub link](https://github.com/uazhlt-ms-program/grad-level-term-project-kaggle-competition-aliklec).
+2. Download the "train.csv" and "test.csv" files from [Kaggle](https://www.kaggle.com/competitions/ling-539-sp-2024-class-competition/data).
+3. Make sure "train.csv" and "test.csv" are in the same directory as the Jupyter notebook.
+4. Confirm that you have Pandas, NumPy, and Scikit-learn installed (at the beginning of the Jupyter notebook, you’ll find three commented lines that can be uncommented for installing these libraries via pip, if needed).
+5. Open the Jupyter notebook "ReviewClassifier.ipynb" and navigate to "Kernel" --> "Restart & Run All" to run it. The test predictions will be printed to a file called "results.csv" in the same directory.
+
+*Note: the last few cells in the notebook are commented out. These include cells to print things like misclassifications, a confusion matrix, and GridSearchCV best parameters. I have kept them in the notebook for possible future development of the model.*
+
+**Python Version/Dependencies**
+
+The code was developed using the following versions:
+
+- `Python==3.11.5`
+- `Pandas==2.0.3`  
+- `NumPy==1.24.3`  
+- `Scikit-learn==1.3.0`
+
+*Using a different version of Python or these libraries may change the code's behavior.
+
+## Challenges/Ideas for Future Improvement
+<br>
+
+The review dataset presented many interesting challenges that could be explored further, and that my model did not address. As mentioned earlier, I couldn't determine why maintaining the "br" tags improved my model's accuracy, and I would like to understand this better. It was also a mystery to me why replacing terms like "movie", "film", and "flick" with a single, unified version decreased the accuracy. These are some patterns I would like to understand better. 
+
+I would also like to investigate other preprocessing steps and how they could impact the results. For example, many of the reviews had typos or informal spellings that could confuse the analysis. Some examples from the data are things like "surprized" and "MOVIE SUUUUUUUUUUUUCKS"---ideally these would be normalized to "surprised" and "movie sucks" to enhance feature alignment. Another interesting aspect of the data was the inclusion of languages other than English. This may have added variability and confusion to the dataset. Nonetheless, the TF-IDF model seems capable of handling multiple languages to some extent. For instance, when examining the top features, I noticed some Chinese characters, indicating that the TF-IDF model might have identified important terms from non-English reviews that suggest specific categories. However, these non-English reviews were a smaller part of the dataset and may not have constituted enough data for the model to pick up on many useful patterns. Ideally, for future improvements of the classifier, all reviews would be translated into English during preprocessing to standardize the data.
+
+Another challenge highlighted by the confusion matrix was the model mistaking positive reviews for negative ones, and vice versa. In reviewing the top coefficients, common terms such as "film" and "movie" were identified as key features for both classes, which likely led to mislabeling. A potentially better approach could be two-stage classification: initially, the model would be trained to differentiate between TV/movie reviews and non-TV/movie reviews. Once TV/movie reviews are isolated, the model could then focus on classifying them as positive or negative. This method could also address situations such as the word "worst" being strongly associated with negative reviews during training, which might tip the classification of a non-TV/movie review into the negative category.
+
+Perhaps the biggest challenge is that the sentiment in many reviews is complex, often blending emotions or using verbal irony in ways that aren't easily classified as "positive" or "negative"—even for a human reviewer. For example:
+
+> ***I got lost a hundred times but didn't mind, because the movie is so bad, it's real fun to watch. Zero-Budget trash with actors not deserving that name. Go check it out!*** 
+(True label: 1 , Predicted: 2)
+
+
+
+> ***This was the worst movie I've ever seen, yet it was also the best movie. Sci Fi original movie's are supposed to be bad, that's what makes them fun!...So go watch this movie, but don't buy it.*** (True label: 1, Predicted: 2)
+
+
+
+> ***This is the best movie I've seen since I got the scope at the proctologists office...this morning.*** (True label: 2, Predicted: 1)
+
+
+
+There were many examples like this of reviewers using sarcasm or expressing both likes and dislikes in the same review, leading to a complex mix of sentiments. These subtle uses of language present a challenge for a basic TF-IDF model, which analyzes word frequency and lacks the ability to interpret the context to understand sarcasm or mixed feelings.  These are the interesting language complexities that a simple TF-IDF model cannot grasp. This limitation highlights the need for more sophisticated models that can better grasp the nuances of human communication.
+
+</script>
+<!-- +++++++++++++++++++++++PARSE MARKDOWN+++++++++++++++++++++++++++++++++ -->
+<script>
+  document.getElementById('project1-content').innerHTML = marked.parse(document.getElementById('project1-md').textContent);
+  document.getElementById('project2-content').innerHTML = marked.parse(document.getElementById('project2-md').textContent);
+</script>
+
+    <!-- RESUME -->
+    <div class="page" id="page-resume">
+      <div class="section-header">
+        <h1>Resume</h1>
+      </div>
+      <div class="resume-grid">
+        <div>
+          <div class="resume-block">
+            <div class="resume-block-title">Recent Professional Experience</div>
+            <div class="resume-entry">
+              <h4>Machine Learning Intern</h4>
+              <div class="re-sub">XRI Global</div>
+              <div class="re-date">Jul 2025 &#8212; Present</div>
+              <p>Fine-tune ASR models on low-resource languages; run models against benchmarks like CER and WER</p>
+            </div>
+            <div class="resume-entry">
+              <h4>Language Services Project Manager</h4>
+              <div class="re-sub">Smartling</div>
+              <div class="re-date">Oct 2025 &#8212; Present</div>
+              <p>Oversee end-to-end localization workflows and translation tools to deliver multilingual content in 80+ languages</p>
+            </div>
+            <div class="resume-entry">
+              <h4>Technical Project Manager</h4>
+              <div class="re-sub">CyraCom International</div>
+              <div class="re-date">Mar 2019 &#8212; Dec 2021</div>
+              <p>Client-facing role quoting and managing end-to-end localization for complex projects involving machine translation, e&#8209;learning, databases, and websites</p>
+            </div>
+            <div class="resume-entry">
+              <h4>Rights Licensing Specialist</h4>
+              <div class="re-sub">University of Hawaiʻi at Mānoa</div>
+              <div class="re-date">Apr 2015 &#8212; Dec 2019</div>
+              <p>Handled translation and rights licensing for a university publisher of over 3,000 humanities, social science, and language reference books focusing on Asia and the Pacific</p>
+            </div>
+            <div class="resume-entry">
+              <h4>Life Sciences Project Manager</h4>
+              <div class="re-sub">TransPerfect</div>
+              <div class="re-date">Sep 2017 &#8212; Jun 2019</div>
+              <p>Managed translation and localization projects for the life sciences team, with a focus on medical documents such as informed consent forms, clinical research protocols, and patient questionnaires</p>
+            </div>
+<!--
+            <div class="resume-entry">
+              <h4>Translation Project Coordinator</h4>
+              <div class="re-sub">TechCorp Inc.</div>
+              <div class="re-date">Jun 2016 &#8212; Aug 2016</div>
+              <p>Coordinated linguistic validation and quality-control steps for Clinical Outcome Assessments</p>
+            </div>
+-->
+          </div>
+        </div>
+        <d iv>
+          <div class="resume-block">
+            <div class="resume-block-title">Education</div>
+            <div class="resume-entry">
+              <h4>M.S. Human Language Technology (expected May 2026)</h4>
+              <div class="re-sub">University of Arizona</div>
+              <div class="re-date">2026</div>
+              <p>Coursework completed in Statistical Natural Language Processing, Advanced Computational Linguistics, Machine Learning, and Python programming.</p>
+            </div>
+            <div class="resume-entry">
+              <h4>B.S. Psychology</h4>
+              <div class="re-sub">University of California, Santa Barbara</div>
+              <div class="re-date">2010</div>
+            </div>
+          </div>
+          <div class="resume-block">
+            <div class="resume-block-title">Certifications</div>
+            <div class="resume-entry">
+              <h4><a href="#" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:1px;transition:border-color .3s" onmouseover="this.style.borderColor='var(--teal-accent)'" onmouseout="this.style.borderColor='var(--border)'">Building Agentic AI Applications for Product & Localization</a></h4>
+              <div class="re-date">2025</div>
+            </div>
+            <div class="resume-entry">
+              <h4><a href="#" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:1px;transition:border-color .3s" onmouseover="this.style.borderColor='var(--teal-accent)'" onmouseout="this.style.borderColor='var(--border)'">
+Computational Thinking for Problem Solving</a></h4>
+              <div class="re-date">2020</div>
+            </div>
+          </div>
+          <div class="resume-block">
+            <div class="resume-block-title">Skills</div>
+            <div class="resume-entry" style="padding-top:0;">
+              <p>Python, Machine Learning, Computational Linguistics</p>
+            </div>
+          </div>
+
+
+          <div class="resume-block">
+            <div class="resume-block-title">Volunteer Work</div>
+            <div class="resume-entry">
+              <h4>Technology & Innovation Volunteer</h4>
+              <div class="re-sub">Women in Localization</div>
+              <div class="re-date">Jun 2025 &#8212; Present</div>
+              <p>Help with documentation, support, and strategic development for the organization's technology and software</p>
+            </div>
+            
+
+            
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+</body>
+</html>
