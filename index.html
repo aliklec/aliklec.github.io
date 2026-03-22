@@ -190,13 +190,28 @@ function showPage(id) {
 
 <div class="main">
   <nav class="topnav">
-    <button class="tab active" data-page="portfolio" onclick="showPage('portfolio')">Portfolio</button>
+    <button class="tab active" data-page="summary" onclick="showPage('summary')">Summary</button>
+    <button class="tab" data-page="portfolio" onclick="showPage('portfolio')">Portfolio</button>
     <button class="tab" data-page="resume" onclick="showPage('resume')">Resume</button>
   </nav>
   <div class="content">
 
+    <!-- SUMMARY -->
+    <div class="page active" id="page-summary">
+      <div class="section-header">
+        <h1>Professional Summary</h1>
+      </div>
+      <div class="project-grid">
+        <div class="project-card" style="cursor:default;">
+          <div class="project-body">
+            <p>I am a project manager and student.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- PORTFOLIO -->
-    <div class="page active" id="page-portfolio">
+    <div class="page" id="page-portfolio">
       <div class="section-header">
         <h1>Selected Projects</h1>
       </div>
