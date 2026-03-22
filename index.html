@@ -270,6 +270,7 @@ Coming soon!
 
 ## Task
 <br />
+
 The dataset for this project contains reviews which fall into 3 categories:
 
 - Not a movie or TV show review (label 0)
@@ -277,10 +278,14 @@ The dataset for this project contains reviews which fall into 3 categories:
 - Negative movie or TV show review (label 2)
 
 There are two files in CSV format--one containing training data and one containing test data. The training file contains three columns: ID, review, and label. The test file contains two columns: ID and review.  The goal was to develop and train a classification model using the labeled data from the training file, in order to then accurately predict which of the three categories each test review should fall into.
-<br />
+
 ## Approach
 <br />
+
 For my first attempt, I created my own custom features and trained a logistic regression model on them. First, I preprocessed the data by replacing NaN items with an empty string, removing certain punctuation I thought would not be relevant for sentiment, making everything lowercase, and getting rid of newline characters and HTML line break tags. Then I came up with some features I felt would signal the categories of the reviews. I used DictVectorizer to transform them into matrices, and then trained a logistic regression model on them. I created various custom features along these lines:
+
+
+
 
 ```Python
 {
