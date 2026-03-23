@@ -52,7 +52,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .detail-hero.p2{background:#c8e6e2}
 .detail-hero h2{font-family:'Playfair Display',serif;font-size:30px;color:var(--teal-dark);font-weight:600;z-index:1}
 .detail-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(255,255,255,0.08),transparent 60%)}
-.detail-content{max-width:740px}
+.detail-content{max-width:1200px}
 .detail-content h3{font-size:20px;font-weight:600;margin:28px 0 12px}
 .detail-content p{font-size:15.5px;color:var(--text-sec);line-height:1.75;margin-bottom:16px}
 .detail-content ul{padding-left:20px;margin-bottom:16px}
@@ -69,6 +69,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .detail-content table{border-collapse:collapse;width:100%;margin-bottom:16px}
 .detail-content th,.detail-content td{border:1px solid var(--border);padding:10px 20px;text-align:center;font-size:15px;color:var(--text-sec)}
 .detail-content th{background:#e4e4e9;font-weight:600}
+
+
 
 
 .detail-links{display:flex;gap:12px;margin-top:32px}
@@ -140,7 +142,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 }
 </style>
 <script>
+
+  
 function showPage(id) {
+  // Update URL when navigating
+  if (id !== 'summary') {
+    window.history.pushState({page: id}, '', '?page=' + id);
+  } else {
+    window.history.pushState({page: id}, '', window.location.pathname);
+  }
+  
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   var tabId = id;
   if (id === 'project1' || id === 'project2') tabId = 'portfolio';
@@ -154,6 +165,31 @@ function showPage(id) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
+
+
+
+// Handle browser back/forward buttons
+window.addEventListener('popstate', function(event) {
+  if (event.state && event.state.page) {
+    showPage(event.state.page);
+  } else {
+    showPage('summary');
+  }
+});
+
+// Check for page parameter on load
+window.addEventListener('load', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const pageParam = urlParams.get('page');
+  if (pageParam && document.getElementById('page-' + pageParam)) {
+    showPage(pageParam);
+  }
+});
+
+
+
+
+
 </script>
 </head>
 <body>
@@ -254,39 +290,93 @@ function showPage(id) {
       </div>
     </div>
 
-<!-- PROJECT 1 -->
+<!-- +++++++++++++++++++++++PROJECT 1+++++++++++++++++++++++++++++++++ -->
+
 <div class="page" id="page-project1">
+
+  <!-- Back button -->
   <button class="back-btn" onclick="showPage('portfolio')">&#8592; Back to Portfolio</button>
-  <div class="detail-hero p1"><h2>Fine-Tuning ASR Models for Low-Resource Languages</h2></div>
-  <div class="detail-content" id="project1-content"></div>
+
+  <!-- Title -->
+  <div class="detail-hero p1">
+    <h2>Fine-Tuning ASR Models for Low-Resource Languages</h2>
+  </div>
+  
+  <!-- Text -->
+  <div class="detail-content">
+    <!-- Hidden markdown content with chart included -->
+    <div id="project1-markdown" style="display: none;">
+
+
+As a Machine Learning intern at XRI Global, I worked on researching ASR Models. I looked at Ethnologue data to understand the distribution of language speakers
+
+## Machine Learning Intern Experience
+
+### Technical Research
+- Fine-tuned ASR models on low-resource languages
+- Analyzed Ethnologue data for language speaker distribution
+- Conducted benchmark testing using CER and WER metrics
+
+### Key Findings
+- Identified challenges in speech recognition for languages with limited training data
+- Developed strategies to improve model performance
+- Collaborated with cross-functional teams to implement solutions
+
+<div style="text-align: center; margin: 30px 0;">
+![Language Speaker Chart](https://aliklec.github.io/langpic.jpg)
+
+[View interactive chart](https://aliklec.github.io/languages-chart.html)
+
+Data Source: [Ethnologue](https://www.ethnologue.com/insights/ethnologue200/)
+
 </div>
 
+### Tools & Technologies
+- Python programming
+- Machine learning frameworks
+- Statistical analysis
+- Data visualization
 
-<!-- PROJECT 2 -->
+## Data Analysis
+
+The Ethnologue data provided valuable insights into:
+- Language speaker distribution across different regions
+- Low-resource language identification
+- Prioritization of languages for ASR development
+
+
+    </div>
+
+    <!-- Script to convert markdown to HTML -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const markdownElement = document.getElementById('project1-markdown');
+      if (markdownElement) {
+        const htmlContent = marked.parse(markdownElement.textContent);
+        // Replace the markdown element with converted HTML
+        markdownElement.outerHTML = htmlContent;
+      }
+    });
+    </script>
+  
+  </div>
+
+</div>
+
+<!-- +++++++++++++++++++++++end of project 1+++++++++++++++++++++++++++++++++ -->
+
+
+
+<!-- +++++++++++++++++++++++PROJECT 2+++++++++++++++++++++++++++++++++ -->
 <div class="page" id="page-project2">
   <button class="back-btn" onclick="showPage('portfolio')">&#8592; Back to Portfolio</button>
   <div class="detail-hero p2"><h2>Movie Review Sentiment Classifier</h2></div>
   <div class="detail-content" id="project2-content"></div>
 </div>
 
-<!-- +++++++++++++++++++++++MARKDOWN PROJECT 1+++++++++++++++++++++++++++++++++ -->
-<script type="text/markdown" id="project1-md">
-## ASR Model Fine-Tuning
 
-Coming soon!
 
-<iframe 
-    src="https://github.com/aliklec/language-chart/blob/main/languages-chart.html"
-    width="100%" 
-    height="800px"
-    frameborder="0">
-</iframe>
-
-Source: Ethnologue
-
-</script>
-
-<!-- +++++++++++++++++++++++MARKDOWN PROJECT 2+++++++++++++++++++++++++++++++++ -->
+<!-- +++++++++++++++++++++++PROJECT 2 MD+++++++++++++++++++++++++++++++++ -->
 <script type="text/markdown" id="project2-md">
 
 ## Task
@@ -424,11 +514,33 @@ Perhaps the biggest challenge is that the sentiment in many reviews is complex, 
 There were many examples like this of reviewers using sarcasm or expressing both likes and dislikes in the same review, leading to a complex mix of sentiments. These subtle uses of language present a challenge for a basic TF-IDF model, which analyzes word frequency and lacks the ability to interpret the context to understand sarcasm or mixed feelings.  These are the interesting language complexities that a simple TF-IDF model cannot grasp. This limitation highlights the need for more sophisticated models that can better grasp the nuances of human communication.
 
 </script>
-<!-- +++++++++++++++++++++++PARSE MARKDOWN+++++++++++++++++++++++++++++++++ -->
+
+
 <script>
-  document.getElementById('project1-content').innerHTML = marked.parse(document.getElementById('project1-md').textContent);
   document.getElementById('project2-content').innerHTML = marked.parse(document.getElementById('project2-md').textContent);
 </script>
+
+    <!-- PROJECT 1 - HTML Version -->
+    <div class="page" id="page-project1">
+      <div class="section-header">
+        <h1>ASR Model Fine-Tuning</h1>
+      </div>
+      <div class="detail-content">
+        <p>Coming soon!</p>
+        
+        <!-- Direct iframe control -->
+        <iframe 
+            src="https://aliklec.github.io/languages-chart.html"
+            width="100%" 
+            height="800px"
+            frameborder="0"
+            style="width: 100%; height: 800px; border: none; margin: 20px 0;">
+        </iframe>
+        
+        <p>Source: Ethnologue</p>
+      </div>
+    </div>
+
 
     <!-- RESUME -->
     <div class="page" id="page-resume">
