@@ -45,8 +45,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .back-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;background:#e4e4e9;border:none;color:var(--text-sec);font-size:13px;font-weight:500;cursor:pointer;transition:all var(--tr);margin-bottom:32px;font-family:inherit}
 .back-btn:hover{background:#d5d5dc;}
 
-
+/* Old hero banner size - deprecated
 .detail-hero{height:100px;border-radius:var(--radius);margin-bottom:36px;display:flex;align-items:center;position:relative;overflow:hidden;background:#c8e6e2;max-width:740px;padding-left:36px}
+ */
+	
+.detail-hero{height:100px;border-radius:var(--radius);margin-bottom:36px;display:flex;align-items:center;position:relative;overflow:hidden;background:#c8e6e2;width:100%;padding-left:56px}
+
 
 .detail-hero.p1{background:#c8e6e2}
 .detail-hero.p2{background:#c8e6e2}
@@ -88,8 +92,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .resume-entry .re-sub{font-size:15px;color:var(--teal-accent);font-weight:500;margin-bottom:2px}
 .resume-entry .re-date{font-size:14.5px;color:var(--text-muted);margin-bottom:6px}
 .resume-entry p{font-size:15.5px;color:var(--text-sec);line-height:1.6}
-#page-summary a{color:inherit;text-decoration:none;border-bottom:1px solid var(--teal-mid);padding-bottom:1px;transition:border-color var(--tr)}
-#page-summary a:hover{border-bottom-color:var(--teal-accent)}
+#page-summary a{color:var(--teal-accent);text-decoration:none;border-bottom:1px solid var(--teal-mid);padding-bottom:2px;transition:all 0.3s ease}
+#page-summary a:hover{color:var(--teal-dark);border-bottom-color:var(--teal-dark);transform:translateY(-1px)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:900px){
@@ -306,9 +310,9 @@ window.addEventListener('load', function() {
   <div class="detail-content">
     <!-- Hidden markdown content with chart included -->
     <div id="project1-markdown" style="display: none;">
-# Test
 		
 ## Overview and Goals
+
 
 As a Machine Learning intern at XRI Global, I researched and fine-tuned Automatic Speech Recognition models, focusing on the *least* spoken of the [Ethnologue list of the top 200 most spoken languages](https://www.ethnologue.com/insights/ethnologue200/).
 
@@ -317,6 +321,7 @@ Speaker distribution across languages is heavily concentrated among the top l
 The goal of my research project was to focus on the lowest-ranked languages within the top 200 to determine availability of open-source speech recognition models and datasets, and to fine-tune ASR models for those languages lacking dedicated, open-source speech recognition models.
 
 ## Initial Research on the ASR Landscape
+
 
 I started researching available ASR data and models by searching ACL Anthology, Hugging Face, Papers with Code, Github, and arXiv, and other sources. To keep track of my findings, I created a spreadsheet, reverse-ranking the Ethnologue 200, and added details for each language including dialects and alternate language names, ISO 639-3 code, available ASR models and data, licensing information, and whether large multilingual models like MMS, Whisper, and Xeus support the language.
 
@@ -337,7 +342,10 @@ Out of the least spoken 50 languages in the Ethnologue list, I identified severa
 - **Gheg** Albanian - "facebook/omnilingual-asr-corpus", "aln_Latn"
 
 While I did successfully fine-tune other models, I focused on Whisper due to it having the best results, clearest recipes, and being most accessible. 
+		
 ## Fine-Tuning Process
+
+		
 #### Tools and Libraries Used
 
 For my fine-tuning research, I used Python and primarily worked in Google Colab Pro with an A100 GPU. 
@@ -357,6 +365,7 @@ The main libraries and tools used were for Whisper fine-tuning were:
 - `evaluate / jiwer`: computing Word Error Rate (WER)
 
 #### Data Exploration and Preprocessing
+
 
 Many of the speech datasets available on Hugging Face are in good shape overall. However, some preprocessing steps were still required to prepare the data for fine-tuning. Taking Sicilian as a working example, a sample from the Omnilingual dataset reveals several elements that needed to be addressed before training. Below we can see that the segment is over 76 seconds long, the sampling rate is 48,000 Hz, and that the transcription contains a mix of punctuation, capitalization, and newline characters:
 
@@ -409,6 +418,8 @@ kamba['train'] = combined_train
 
 #### Feature Extractor and Tokenizer
 
+
+
 After data loading and preprocessing, the next step was to configure the feature extractor and tokenizer. Whisper's feature extractor transforms raw audio into log-mel spectrograms. As covered in my Speech Technology class, the mel scale approximates how humans perceive pitch, emphasizing the frequency ranges most useful for distinguishing speech sounds, which makes it a good fit for speech recognition. The feature extractor also ensures each audio segment is padded or shortened to 30 seconds, as required by the Whisper model.
 
 The tokenizer handles the text side of the pipeline, mapping reference transcriptions to token IDs during training and then back to to text during inference. When fine-tuning for low-resource languages not directly supported by Whisper, it is important to choose a closely related supported language as the base. This helps the model learn more effectively due to shared sounds, structure, and spelling conventions between the two languages. Based on linguistic proximity, I made the following choices for each of the languages I worked with:
@@ -431,6 +442,8 @@ tokenizer = WhisperTokenizer.from_pretrained("openai/whisper-small", language="i
 ```
 
 #### Preparing the Dataset
+
+
 
 With the feature extractor and tokenizer configured, I then applied them to the dataset using the function below, which converts the raw audio into a log-mel spectrogram and the reference transcription into token IDs:
 
@@ -537,7 +550,7 @@ def compute_metrics(pred):
     wer = 100 * metric.compute(predictions=pred_str, references=label_str)
     return {"wer": wer}
 ```
-##### Configuring and Running Training
+### Configuring and Running Training
 
 The final step was to configure the training arguments and launch fine-tuning. Below is a typical configuration I used, with a batch size of 16, a learning rate of 1e-5, and 5,000 training steps. For training, I used Hugging Face's `Seq2SeqTrainer`, which takes care of running training, evaluating the model, and saving checkpoints. Setting `predict_with_generate` to `True` ensures that during evaluation, the model generates full transcriptions. WER needs to compare whole sentences, and without this parameter, the model would only output raw token probabilities rather than an actual transcription to evaluate.
 
