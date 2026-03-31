@@ -57,11 +57,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .detail-hero h2{font-family:'Playfair Display',serif;font-size:30px;color:var(--teal-dark);font-weight:600;z-index:1}
 .detail-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(255,255,255,0.08),transparent 60%)}
 .detail-content{max-width:1200px}
-.detail-content h3{font-size:20px;font-weight:600;margin:28px 0 12px}
+.detail-content h2{font-size:24px;font-weight:600;margin:36px 0 20px}
+.detail-content h3{font-size:20px;font-weight:600;margin:28px 0 20px}
+.detail-content h4{font-size:18px;font-weight:600;margin:24px 0 16px}
 .detail-content p{font-size:15.5px;color:var(--text-sec);line-height:1.75;margin-bottom:16px}
 .detail-content ul{padding-left:20px;margin-bottom:16px}
 .detail-content li{font-size:15px;color:var(--text-sec);line-height:1.8}
-.detail-content pre{background:#e4e4e9;color:#111118;border-radius:10px;padding:20px 24px;margin:16px 0 20px;overflow-x:auto;font-size:13px;line-height:1.7}
+.detail-content pre{background:#e4e4e9;color:#111118;border-radius:10px;padding:20px 24px;margin:16px 0 20px;overflow-x:auto;font-size:13px;line-height:1.7;white-space:pre-wrap;word-wrap:break-word}
 .detail-content code{font-family:'DM Mono',monospace,Consolas,'Courier New';font-size:13px}
 .detail-content pre .kw{color:#7c3aed}
 .detail-content pre .fn{color:#2563eb}
@@ -76,9 +78,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .detail-content th{background:#e4e4e9;font-weight:600}
 */
 
-.detail-content table{border-collapse:collapse;width:100%;margin-bottom:16px}
-.detail-content th,.detail-content td{border:1px solid var(--border);padding:10px 20px;text-align:left;font-size:15px;color:var(--text-sec)}
+.detail-content table{border-collapse:collapse;width:100%;margin-bottom:16px;table-layout:fixed}
+.detail-content th,.detail-content td{border:1px solid var(--border);padding:10px 14px;text-align:left;font-size:15px;color:var(--text-sec);word-wrap:break-word;overflow-wrap:break-word;vertical-align:top}
 .detail-content th{background:#e4e4e9;font-weight:600}
+.detail-content td ul{margin:0;padding-left:18px;list-style:disc}.detail-content td li{margin-bottom:0;line-height:1.4}
 
 
 
@@ -97,8 +100,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .resume-entry .re-sub{font-size:15px;color:var(--teal-accent);font-weight:500;margin-bottom:2px}
 .resume-entry .re-date{font-size:14.5px;color:var(--text-muted);margin-bottom:6px}
 .resume-entry p{font-size:15.5px;color:var(--text-sec);line-height:1.6}
-#page-summary a{color:var(--teal-accent);text-decoration:none;border-bottom:1px solid var(--teal-mid);padding-bottom:2px;transition:all 0.3s ease}
-#page-summary a:hover{color:var(--teal-dark);border-bottom-color:var(--teal-dark);transform:translateY(-1px)}
+#page-summary a,.detail-content a{color:var(--teal-accent);text-decoration:none;border-bottom:1px solid var(--teal-mid);padding-bottom:2px;transition:all 0.3s ease}
+#page-summary a:hover,.detail-content a:hover{color:var(--teal-dark);border-bottom-color:var(--teal-dark);transform:translateY(-1px)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:900px){
@@ -495,37 +498,37 @@ from typing import Any, Dict, List, Union
 
 @dataclass
 class DataCollatorSpeechSeq2SeqWithPadding:
-    feature_extractor: Any
-    tokenizer: Any
-    decoder_start_token_id: int
+    feature_extractor: Any
+    tokenizer: Any
+    decoder_start_token_id: int
 
-    def __call__(self, features: List[Dict[str, Union[List[int], torch.Tensor]]]) -> Dict[str, torch.Tensor]:
-    
-        # split inputs and labels to deal with them differently 
-        input_features = [{"input_features": feature["input_features"]} for feature in features]
-    
-	    # convert audio features to tensors (already same length)
-        batch = self.feature_extractor.pad(input_features, return_tensors="pt")
-		
-		# pad transcription labels to the same length and convert to tensors
-        label_features = [{"input_ids": feature["labels"]} for feature in features]
-        labels_batch = self.tokenizer.pad(label_features, return_tensors="pt")
+    def __call__(self, features: List[Dict[str, Union[List[int], torch.Tensor]]]) -> Dict[str, torch.Tensor]:
+    
+        # split inputs and labels to deal with them differently 
+        input_features = [{"input_features": feature["input_features"]} for feature in features]
+    
+        # convert audio features to tensors (already same length)
+        batch = self.feature_extractor.pad(input_features, return_tensors="pt")
+        
+        # pad transcription labels to the same length and convert to tensors
+        label_features = [{"input_ids": feature["labels"]} for feature in features]
+        labels_batch = self.tokenizer.pad(label_features, return_tensors="pt")
 
-        # replace padding tokens with -100 so they are ignored during loss calculation
-        labels = labels_batch["input_ids"].masked_fill(labels_batch.attention_mask.ne(1), -100)
+        # replace padding tokens with -100 so they are ignored during loss calculation
+        labels = labels_batch["input_ids"].masked_fill(labels_batch.attention_mask.ne(1), -100)
 
-        # remove start token if it was added during tokenization (it gets added again later)
-        if (labels[:, 0] == self.decoder_start_token_id).all().cpu().item():
-            labels = labels[:, 1:]
+        # remove start token if it was added during tokenization (it gets added again later)
+        if (labels[:, 0] == self.decoder_start_token_id).all().cpu().item():
+            labels = labels[:, 1:]
 
-        batch["labels"] = labels
-        return batch
-        
+        batch["labels"] = labels
+        return batch
+        
 #initialize
 data_collator = DataCollatorSpeechSeq2SeqWithPadding(
-	feature_extractor=feature_extractor,
-	tokenizer=tokenizer,
-	decoder_start_token_id=model.config.decoder_start_token_id,
+    feature_extractor=feature_extractor,
+    tokenizer=tokenizer,
+    decoder_start_token_id=model.config.decoder_start_token_id,
 )
 
 ```
@@ -603,12 +606,12 @@ Using the methods described above, I was able to improve transcription accuracy 
 | **Speakers**                                                   | 5.3M                                                                                                                                                  | 4.7M                                                                                                                                                                                                                                                                                                                                             | 5.6M                                                                                                                                                                                                            | 4.7M          |
 | **Dataset**                                                    | Fleurs                                                                                                                                                | Omnilingual                                                                                                                                                                                                                                                                                                                                      | SEACrowd                                                                                                                                                                                                        | Omnilingual   |
 | **License**                                                    | CC-BY-4.0                                                                                                                                             | CC-BY-4.0                                                                                                                                                                                                                                                                                                                                        | Apache-2.0                                                                                                                                                                                                      | CC-BY-4.0     |
-| **Training Data**                                              | ~16 hours                                                                                                                                             | ~5 hours (filtered from 9 hrs)                                                                                                                                                                                                                                                                                                                   | ~30 minutes                                                                                                                                                                                                     | ~3.4 hours    |
+| **Training Data**                                              | 16 hours                                                                                                                                             | 5 hours (filtered from 9 hrs)                                                                                                                                                                                                                                                                                                                   | 30 minutes                                                                                                                                                                                                     | 3.4 hours    |
 | **Base Language used for Fine-Tuning**                         | Swahili                                                                                                                                               | Italian                                                                                                                                                                                                                                                                                                                                          | Malay                                                                                                                                                                                                           | Albanian      |
 | **Baseline Comparison WER**                                    | 123%                                                                                                                                                  | 75%                                                                                                                                                                                                                                                                                                                                              | 77%                                                                                                                                                                                                             | 97%           |
 | **Best Fine-Tuned WER training on Whisper Small**              | 52%                                                                                                                                                   | 35%                                                                                                                                                                                                                                                                                                                                              | 14%                                                                                                                                                                                                             | 49%           |
 | **WER Reduction**                                              | 58%                                                                                                                                                   | 53%                                                                                                                                                                                                                                                                                                                                              | 82%                                                                                                                                                                                                             | 49%           |
-| **Other Experiments/<br>Notes/<br>Considerations for Results** | - Whisper Medium (~45% WER), <br>- Whisper Large v3 + LoRA (~77% WER)<br>- Noise augmentation using audiomentations<br>(~53% WER, no improvement)<br> | - Whisper Medium (6.14 CER), CER of 6.14 fine-tuning the Whisper Medium 769M parameter model, as compared to Omnilinguals’ reported Sicilian CER of 5.2 for a 7B parameter model.<br>- Whisper Large + LoRA (11.91 CER )<br>- Only 10 test items in original test set. Also ran test on larger dev set (187 items). ~44% WER vs ~35% on test set | - 20-utterance single-speaker test set<br>- Possible transfer learning from Malay<br>- 31.7% Out of Vocabulary rate<br>- Generalizability may be limited due to the single-speaker setup and small dataset size |               |
+| **Other Experiments / Notes / Considerations for Results** | BULLETS_KAMBA | BULLETS_SICILIAN | BULLETS_MINANGKABAU | BULLETS_GHEG |
 
 ## Challenges
 
@@ -663,8 +666,19 @@ Sharma, A. K., et al. (2025). Fine-tuning Whisper Tiny for Swahili ASR: Challeng
       const markdownElement = document.getElementById('project1-markdown');
       if (markdownElement) {
         const htmlContent = marked.parse(markdownElement.textContent);
-        // Replace the markdown element with converted HTML
         markdownElement.outerHTML = htmlContent;
+
+        // Inject bullet lists into the Results table
+        var bullets = {
+          'BULLETS_KAMBA': '<ul><li>Whisper Medium (45% WER)</li><li>Whisper Large v3 + LoRA (77% WER)</li><li>Noise augmentation using audiomentations (53% WER, no improvement)</li></ul>',
+          'BULLETS_SICILIAN': '<ul><li>Whisper Medium (6.14 CER), CER of 6.14 fine-tuning the Whisper Medium 769M parameter model, as compared to Omnilinguals\' reported Sicilian CER of 5.2 for a 7B parameter model.</li><li>Whisper Large + LoRA (11.91 CER)</li><li>Only 10 test items in original test set. Also ran test on larger dev set (187 items). 44% WER vs 35% on test set</li></ul>',
+          'BULLETS_MINANGKABAU': '<ul><li>20-utterance single-speaker test set</li><li>Possible transfer learning from Malay</li><li>31.7% Out of Vocabulary rate</li><li>Generalizability may be limited due to the single-speaker setup and small dataset size</li></ul>',
+          'BULLETS_GHEG': '<ul><li>Whisper Medium (36% WER)</li></ul>'
+        };
+        document.querySelectorAll('.detail-content td').forEach(function(td) {
+          var key = td.textContent.trim();
+          if (bullets[key]) td.innerHTML = bullets[key];
+        });
       }
     });
     </script>
