@@ -344,10 +344,10 @@ In terms of data, I listed everything I came across, but the aim was to find dat
 I also researched options for testing and benchmarking ASR models, as well as recipes for fine-tuning on speech data. One helpful resource was Hugging Face’s 2022 [Whisper Fine Tuning Event](https://github.com/huggingface/community-events/tree/main/whisper-fine-tuning-event) documentation and [fine-tuning guide](https://huggingface.co/blog/fine-tune-whisper). For MMS, [Fine-tuning MMS Adapter Models for Multi-Lingual ASR](https://huggingface.co/blog/mms_adapters) was another useful reference.
 
 Out of the least spoken 50 languages in the Ethnologue list, I identified several with open source datasets that did not have dedicated, open source ASR models, meeting the criteria for fine-tuning candidates. The following are the languages and datasets I ended up working with for fine-tuning:
-- **Kamba** - "google/fleurs", "kam_ke"
-- **Minangkabau** - "librivox_indonesia_min_seacrowd_sptext"
-- **Sicilian** - facebook/omnilingual-asr-corpus", "scn_Latn"
-- **Gheg** Albanian - "facebook/omnilingual-asr-corpus", "aln_Latn"
+- **Kamba** - [Google FLEURS](https://huggingface.co/datasets/google/fleurs)
+- **Minangkabau** - [SEACrowd Data Hub](https://github.com/SEACrowd)
+- **Sicilian** - [Meta Omnilingual ASR Corpus](https://huggingface.co/datasets/facebook/omnilingual-asr-corpus)
+- **Gheg** Albanian - [Meta Omnilingual ASR Corpus](https://huggingface.co/datasets/facebook/omnilingual-asr-corpus)
 
 While I did successfully fine-tune other models, I focused on Whisper due to it having the best results, clearest recipes, and being most accessible. 
 		
