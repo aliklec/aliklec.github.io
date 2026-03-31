@@ -57,6 +57,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .detail-hero h2{font-family:'Playfair Display',serif;font-size:30px;color:var(--teal-dark);font-weight:600;z-index:1}
 .detail-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(255,255,255,0.08),transparent 60%)}
 .detail-content{max-width:1200px;overflow-wrap:break-word;word-wrap:break-word}
+.detail-content img{max-width:100%;height:auto}
 .detail-content h2{font-size:24px;font-weight:600;margin:36px 0 20px}
 .detail-content h3{font-size:20px;font-weight:600;margin:28px 0 20px}
 .detail-content h4{font-size:18px;font-weight:600;margin:24px 0 16px}
@@ -557,7 +558,7 @@ def compute_metrics(pred):
     wer = 100 * metric.compute(predictions=pred_str, references=label_str)
     return {"wer": wer}
 ```
-### Configuring and Running Training
+#### Configuring and Running Training
 
 The final step was to configure the training arguments and launch fine-tuning. Below is a typical configuration I used, with a batch size of 16, a learning rate of 1e-5, and 5,000 training steps. For training, I used Hugging Face's `Seq2SeqTrainer`, which takes care of running training, evaluating the model, and saving checkpoints. Setting `predict_with_generate` to `True` ensures that during evaluation, the model generates full transcriptions. WER needs to compare whole sentences, and without this parameter, the model would only output raw token probabilities rather than an actual transcription to evaluate.
 
@@ -928,4 +929,4 @@ Computational Thinking for Problem Solving</a></h4>
               <h4>Technology & Innovation Volunteer</h4>
               <div class="re-sub">Women in Localization</div>
               <div class="re-date">Jun 2025 &#8212; Present</div>
-              <p>Help with documentation, support, and strategic development for the org
+              <p>Help with documentation, support, and strategic development for the org                       
