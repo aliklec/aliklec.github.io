@@ -324,7 +324,7 @@ window.addEventListener('load', function() {
 
 As a Machine Learning intern at XRI Global, I researched and fine-tuned Automatic Speech Recognition models, focusing on the *least* spoken of the [Ethnologue top 200 most spoken languages list](https://www.ethnologue.com/insights/ethnologue200/).
 
-Speaker distribution across languages is heavily concentrated among the top languages, with a steep decline moving down the ranks, followed by a long tail of languages with smaller speaker bases. The Ethnologue 200 counts both native and non-native speakers of languages. The data reveals that the top 100 languages are spoken by 9.63 billion people, while the next 100 are spoken by 786.7 million people. Out of the 200 most spoken languages (counting native and second language speakers), the top 100 represent 92% of the total whereas the next 100 is about 8%. I created the graph [here](https://aliklec.github.io/languages-chart.html) using the Ethnologue 200 data to show this distribution. Considering *native-speakers only*, Ethnologue [explains](https://www.ethnologue.com/insights/how-many-languages/) that the top 20 languages (just 0.3% of the world's 7000+ languages) are spoken natively by 3.7 billion people, almost 50% of the population. The concentration of speakers means that more resources, models, and data are available for the top languages, even though the lower ranked languages have millions of speakers.
+Speaker distribution across languages is heavily concentrated among the top languages, with a steep decline moving down the ranks, followed by a long tail of languages with smaller speaker bases. The Ethnologue 200 counts both native and non-native speakers of languages. The data reveals that the top 100 languages are spoken by 9.63 billion people, while the next 100 are spoken by 786.7 million people. Out of the 200 most spoken languages (counting native and second language speakers), the top 100 represent 92% of the total whereas the next 100 is about 8%. I created the graph [here](https://aliklec.github.io/languages-chart.html) using the Ethnologue 200 data to show this distribution. Considering *native-speakers only*, Ethnologue [explains](https://www.ethnologue.com/insights/how-many-languages/) that the top 20 languages (just 0.3% of the world's 7000+ languages) are spoken natively by 3.7 billion people, almost 50% of the population. The concentration of speakers means that more resources, models, and data are available for the top languages.
 
 The goal of my research project was to focus on the lowest-ranked languages within the top 200 to determine availability of open-source speech recognition models and datasets, and to fine-tune ASR models for those languages lacking dedicated, open-source speech recognition models.
 
@@ -343,52 +343,52 @@ In terms of data, I listed everything I came across, but the aim was to find dat
 
 I also researched options for testing and benchmarking ASR models, as well as recipes for fine-tuning on speech data. One helpful resource was Hugging Face's 2022 [Whisper Fine Tuning Event](https://github.com/huggingface/community-events/tree/main/whisper-fine-tuning-event) documentation and [fine-tuning guide](https://huggingface.co/blog/fine-tune-whisper). For MMS, [Fine-tuning MMS Adapter Models for Multi-Lingual ASR](https://huggingface.co/blog/mms_adapters) was another useful reference.
 
-Out of the least spoken 50 languages in the Ethnologue list, I identified several with open source datasets that did not have dedicated, open source ASR models, meeting the criteria for fine-tuning candidates. The following are the languages and datasets I ended up working with for fine-tuning:
+Out of the least spoken 50 languages in the Ethnologue list, I identified several with open source datasets that did not have dedicated, open source ASR models, meeting the criteria for fine-tuning candidates. The following are the languages and datasets I chose to focus on:
 - **Kamba** - [Google FLEURS](https://huggingface.co/datasets/google/fleurs)
 - **Minangkabau** - [SEACrowd Data Hub](https://github.com/SEACrowd)
 - **Sicilian** - [Meta Omnilingual ASR Corpus](https://huggingface.co/datasets/facebook/omnilingual-asr-corpus)
 - **Gheg** Albanian - [Meta Omnilingual ASR Corpus](https://huggingface.co/datasets/facebook/omnilingual-asr-corpus)
 
-While I did successfully fine-tune other models, I focused on Whisper due to it having the best results, clearest recipes, and being most accessible. 
+I primarily worked with Whisper as the base model due to it having the best fine-tuning results, clearest recipes, and being most accessible, though I did experiment with other models.
 		
 ## Fine-Tuning Process
 
 		
 #### Tools and Libraries Used
 
-For my fine-tuning research, I used Python and primarily worked in Google Colab Pro with an A100 GPU. 
+For my fine-tuning research, I used Python and worked in Google Colab Pro with an A100 GPU. 
 
-The main libraries and tools used were for Whisper fine-tuning were:
+The main libraries and tools I used for Whisper fine-tuning were:
 - `datasets` (Hugging Face): downloading and managing speech datasets
-	- `DatasetDict`: organizing train and test splits
-	- `load_dataset`: fetching data from the Hugging Face Hub
+	- `DatasetDict`: organizing dataset splits
+	- `load_dataset`: retrieving data from Hugging Face Hub
 	- `Audio`: casting audio columns and resampling
 - `transformers` (Hugging Face): core library providing Whisper components
-	-  `WhisperFeatureExtractor`: converting raw audio to log-Mel spectrogram features
+	- `WhisperFeatureExtractor`: converting audio to log-Mel spectrograms
 	- `WhisperTokenizer`: encoding and decoding text tokens
 	- `WhisperForConditionalGeneration`: loading pretrained Whisper model for fine-tuning
 	- `DataCollatorSpeechSeq2SeqWithPadding`: preparing PyTorch tensors with proper padding
-	- `Seq2SeqTrainer` and `Seq2SeqTrainingArguments`: configuring and running the training loop
+	- `Seq2SeqTrainer` and `Seq2SeqTrainingArguments`: configuring and running training loop
 - `torch` (PyTorch) tensor operations
 - `evaluate / jiwer`: computing Word Error Rate (WER)
 
 #### Data Exploration and Preprocessing
 
 
-Many of the speech datasets available on Hugging Face are in good shape overall. However, some preprocessing steps were still required to prepare the data for fine-tuning. Taking Sicilian as a working example, a sample from the Omnilingual dataset reveals several elements that needed to be addressed before training. Below we can see that the segment is over 76 seconds long, the sampling rate is 48,000 Hz, and that the transcription contains a mix of punctuation, capitalization, and newline characters:
+Many of the speech datasets available on Hugging Face are in good shape overall. However, some preprocessing steps were still required to prepare the data for fine-tuning. Below I will walk through my fine-tuning steps using Omnilingual's Sicilian data as an example. Printing a sample from the dataset reveals several elements that needed to be addressed before training. Below we can see that the segment is over 76 seconds long, the sampling rate is 48,000 Hz, and the transcription contains a mix of punctuation, capitalization, and newline characters:
 
 ```
 {'language': 'scn_Latn', 'speaker_id': 'spk01', 'prompt_id': 'a001', 'prompt': 'How much exercise does a dog need daily?', 'segment_id': 's01', 'audio': {'path': 'spk01_a001_s01.flac', 'array': array([ 9.15527344e-05,  1.52587891e-04,  6.10351562e-05, ...,
        -1.64794922e-03, -1.73950195e-03, -1.86157227e-03]), 'sampling_rate': 48000}, 'duration': 76.60825, 'raw_text': "Allura... Quantu eserciziu avissi a fari un cani ogni jornu? \nSinceramenti nun haiu idea, 'un haiu mai avutu un cani. \nPerò pozzu arrispùnniri pinsannu a chiddu ca vitti fari ad àutri... generalmenti si senti sempri ca lu cani havi bisognu di fari la so passiata cutidiana ca è o na passiata o è pi iddu fari li so' affari, li bisogni. \nNun lu sacciu. \n'N tiurìa sunnu tutti dui li cosi, a cui pensu quannu taliu li pillìculi o àutri cchiù o menu sempri ddà. \nPi quantu riguarda l'eserciziu, supponemu ca na caminata avissi a durari almenu deci minuti forsi venti minuti e quinni pozzu suppòniri chi chista è la quantità mìnima c'avissi a fari nu cani ogni jornu... multiplicatu pi lu nùmeru di bisogni... Un'ura di eserciziu macari macari... lu cani chiaramenti si movi puru nt casa. \nNun si tratta sulu di attività esterni. \nAllura non lu sacciu chiù, supponemu ca na passiata di un'ura è lo sporti minimu, si appressu si pò fari n'àutra, di chiù mègghiu ancora.", 'iso_639_3': 'scn', 'glottocode': 'sici1248', 'iso_15924': 'Latn'}
 ```
 
-Whisper was designed to process audio in 30-second segments and anything longer is truncated. Trimmed audio would create a mismatch with the reference transcription and could introduce hallucinations. To deal with this length issue, I filtered out segments longer than 30 seconds:
+Whisper was designed to process audio in 30-second segments and anything longer is truncated. Trimmed audio would create a mismatch with the reference transcription and could introduce hallucinations and incorrect transcriptions. To deal with the length issue, I filtered out segments longer than 30 seconds using the code below. The original Sicilian dataset has about 9 hours of speech data, of which approximately 5 hours remained after filtering. 
 
 ```
 scn = scn.filter(lambda x: x["duration"] <= 30.0)
 ```
 
-Another preprocessing step involved ensuring each audio segment was resampled to match the correct input format. Whisper expects audio at a sampling rate of 16,000 samples per second. Using a different sample rate would distort how the audio is interpreted by the model, leading to poor transcription results. To address this, I used `cast_column` (a Hugging Face method that resamples audio on the fly) to convert the Sicilian data sample rate:
+Another preprocessing step involved ensuring each audio segment was resampled to match the correct input format. Whisper expects audio at a rate of 16,000 samples per second. Using a different rate would distort how the audio is interpreted by the model, leading to poor transcription results. To address this, I used `cast_column` (a Hugging Face method that resamples audio on the fly) to convert the Sicilian data sampling rate:
 
 ```
 from datasets import Audio
@@ -396,7 +396,7 @@ from datasets import Audio
 scn = scn.cast_column("audio", Audio(sampling_rate=16000))
 ```
 
-There was also a decision to make about text normalization, which can have a significant impact on WER calculations. To illustrate, computing WER for "`electronic engineer`" against "`Electronic engineer.`" returns a score of 1.0, a 100% error rate, because the capital letter and period cause the words to be treated as different. Although accurate punctuation prediction is certainly useful, normalizing text is standard practice for WER evaluation. Both Whisper and MMS report normalized WER in their published results, and many datasets provide already-normalized transcriptions. For consistent comparison, I normalized the Sicilian data as well. Below is a sample transcript before and after applying the Whisper normalizer:"
+There were also decisions to make about text normalization, which can have a significant impact on WER calculations. To illustrate, computing WER for "`electronic engineer`" against "`Electronic engineer.`" returns a score of 1.0, a 100% error rate, because the capital letter and period cause the words to be treated as different. Although ASR systems that can accurately predict punctuation are useful, normalizing text is standard practice for WER evaluation. Both Whisper and MMS report normalized WER in their published results, and many datasets provide already-normalized transcriptions. For consistent comparison, I normalized the Sicilian data as well. Below is a sample transcript before and after applying the Whisper normalizer:"
 
 ```
 from whisper_normalizer.basic import BasicTextNormalizer
@@ -416,7 +416,7 @@ Normalized:  allura quantu eserciziu avissi a fari un cani ogni jornu sinceramen
 
 ```
 
-With low-resource languages, it's often the case that you are dealing with small datasets, which call for strategies to maximize the data. In some cases, I chose to combine training and development to to increase the number of training examples:
+Working with low-resource languages often calls for strategies to maximize the limited amount of data, so in some cases, I also chose to combine training and development data to increase the number of training examples:
 
 ```
 from datasets import concatenate_datasets
@@ -430,14 +430,14 @@ kamba['train'] = combined_train
 
 After data loading and preprocessing, the next step was to configure the feature extractor and tokenizer. Whisper's feature extractor transforms raw audio into log-mel spectrograms. As covered in my Speech Technology class, the mel scale approximates how humans perceive pitch, emphasizing the frequency ranges most useful for distinguishing speech sounds, which makes it a good fit for speech recognition. The feature extractor also ensures each audio segment is padded or shortened to 30 seconds, as required by the Whisper model.
 
-The tokenizer handles the text side of the pipeline, mapping reference transcriptions to token IDs during training and then back to to text during inference. When fine-tuning for low-resource languages not directly supported by Whisper, it is important to choose a closely related supported language as the base. This helps the model learn more effectively due to shared sounds, structure, and spelling conventions between the two languages. Based on linguistic proximity, I made the following choices for each of the languages I worked with:
+The tokenizer handles the text side of the pipeline, mapping reference transcriptions to token IDs during training and then back to text during inference. When fine-tuning on languages not directly supported by Whisper, it is important to select the most closely related base language available. This helps the model learn more effectively due to shared sound patterns, structure, and spelling conventions. Based on linguistic proximity, I made the following choices for each of the languages I worked with:
 
-| Base Language | Fine-Tuning Language |
-|---------------|----------------------|
-| Swahili       | Kamba                |
-| Italian       | Sicilian             |
-| Malay         | Minangkabau          |
-| Albanian      | Gheg Albanian        |
+| Fine-Tuning Language | Base Language |
+|----------------------|---------------|
+| Gheg Albanian        | Albanian      |
+| Kamba                | Swahili       |
+| Minangkabau          | Malay         |
+| Sicilian             | Italian       |
 
 The feature extractor and tokenizer were then loaded as follows with the chosen base language:
 
@@ -453,19 +453,19 @@ tokenizer = WhisperTokenizer.from_pretrained("openai/whisper-small", language="i
 
 
 
-With the feature extractor and tokenizer configured, I then applied them to the dataset using the function below, which converts the raw audio into a log-mel spectrogram and the reference transcription into token IDs:
+With the feature extractor and tokenizer configured, I applied them to the dataset using the function below, which converts the raw audio into log-mel spectrograms and the reference transcriptions into token IDs:
 
 ```
 def prepare_dataset(batch):
-    # load data
-    audio = batch["audio"]
+    # load data
+    audio = batch["audio"]
 
-    # convert raw audio to log-mel spectrogram
-    batch["input_features"] = feature_extractor(audio["array"], sampling_rate=audio["sampling_rate"]).input_features[0]
+    # convert raw audio to log-mel spectrogram
+    batch["input_features"] = feature_extractor(audio["array"], sampling_rate=audio["sampling_rate"]).input_features[0]
 
-    # convert transcription to token IDs
-    batch["labels"] = tokenizer(batch["text"]).input_ids
-    return batch
+    # convert transcription to token IDs
+    batch["labels"] = tokenizer(batch["text"]).input_ids
+    return batch
 ```
 
 Then I mapped the function across the dataset, removing the original columns, leaving only `input_features` and `labels`:
@@ -475,7 +475,7 @@ scn = scn.map(prepare_dataset, remove_columns=min.column_names)
 
 #### Loading and Configuring the Pre-Trained Model
 
-The pre-trained Whisper model also needed to be configured with the related base language ensure consistency with the tokenizer and to get the best results from fine-tuning as shown in the code here (using the Sicilian example with baseline Italian):
+The pre-trained Whisper model also needed to be configured with the related base language to ensure tokenizer consistency and to provide the most linguistically similar starting point for decoding:
 
 ```
 from transformers import WhisperForConditionalGeneration
@@ -488,7 +488,7 @@ model.generation_config.forced_decoder_ids = None
 ```
 #### Defining the Data Collator
 
-PyTorch tensors require everything in a batch to be the same size. The data collator is used to make sure that the transcriptions, which vary in length, are padded to the same size so they can be converted to tensors. It also replaces padding tokens with -100, a special value in PyTorch that tells the model to ignore those positions so it only trains on actual data. The data collator also checks if a start token was already added to the beginning of each transcription, and removes it if so, since the model will add the start token back on later. The implementation I used for fine-tuning is shown below:
+After loading and configuring the model, the next step was defining and initializing the data collator. PyTorch tensors require everything in a batch to be the same size. The data collator is used to make sure that the tokenized transcription sequences, which vary in length, are padded to the same length so they can be converted to tensors. It also replaces padding tokens with -100, a special value in PyTorch that tells the model to ignore those positions so it only trains on actual data. The data collator also checks if a start token was already added to the beginning of each transcription, and removes it if so, since the model will add the start token back on later. The implementation I used for fine-tuning is shown below:
 
 ```
 import torch
@@ -514,7 +514,7 @@ class DataCollatorSpeechSeq2SeqWithPadding:
         label_features = [{"input_ids": feature["labels"]} for feature in features]
         labels_batch = self.tokenizer.pad(label_features, return_tensors="pt")
 
-        # replace padding tokens with -100 so they are ignored during loss calculation
+        # replace padding tokens with -100 so they are ignored during training
         labels = labels_batch["input_ids"].masked_fill(labels_batch.attention_mask.ne(1), -100)
 
         # remove start token if it was added during tokenization (it gets added again later)
@@ -535,7 +535,7 @@ data_collator = DataCollatorSpeechSeq2SeqWithPadding(
 
 #### Evaluation
 
-For evaluation, I used Word Error Rate (WER) as the primary metric. WER is reported by both Whisper and MMS in their published results and was the more commonly used measure across the ASR research I reviewed. Generally, WER gives a more meaningful sense of transcription accuracy for languages where words are separated by spaces. For example, transcribing 'vest' as 'best' would score well under CER since only one character differs, but WER counts it as a completely different word, which better reflects the change in meaning. That said, CER is more appropriate for character-based languages, and I did use it in some runs to compare against the Omnilingual ASR paper, which reports its results in CER.
+For evaluation, I used Word Error Rate (WER) as the primary metric. WER is reported by both Whisper and MMS in their published results and was the more commonly used measure across the ASR research I reviewed. Generally, WER gives a more meaningful sense of transcription accuracy for languages where words are separated by spaces. For example, transcribing 'vest' as 'best' would score well under CER since only one character differs, but WER considers them completely different words, which better reflects the change in meaning. That said, CER is more appropriate for character-based languages, and I did use it in some runs to compare against the Omnilingual ASR paper, which reports its results in CER.
 
 The function below shows the WER computation I used during training. It replaces the -100 values with the pad token ID so they can be decoded, then converts both predictions and labels back to text before calculating the score:
 
@@ -545,18 +545,17 @@ metric = evaluate.load("wer")
 
 def compute_metrics(pred):
 
-    pred_ids = pred.predictions
-    label_ids = pred.label_ids
+    pred_ids = pred.predictions
+    label_ids = pred.label_ids
 
-    # replace -100 with the pad_token_id
-    label_ids[label_ids == -100] = tokenizer.pad_token_id
+    # replace -100 with the pad_token_id
+    label_ids[label_ids == -100] = tokenizer.pad_token_id
 
-    # we do not want to group tokens when computing the metrics
-    pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
-    label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
+    pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
+    label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
 
-    wer = 100 * metric.compute(predictions=pred_str, references=label_str)
-    return {"wer": wer}
+    wer = 100 * metric.compute(predictions=pred_str, references=label_str)
+    return {"wer": wer}
 ```
 ### Configuring and Running Training
 
@@ -621,16 +620,18 @@ A related challenge was adapting the available data to fit specific model requir
 
 On the technical side, I ran into backward compatibility issues with the Hugging Face `datasets` library. Updates to the library caused conflicts with older datasets, and after searching the Hugging Face forums I found a [solution](https://github.com/huggingface/datasets/issues/7693) that involved downgrading to version 3.6.0 to use `load_dataset` reliably. I also encountered errors related to backpropagation through the computation graph, as well as floating point precision issues during training, both of which required additional debugging.
 
-Working with some of the large multilingual ASR models proved difficult despite their claimed support for many languages. XEUS, for example, presents itself as covering over 4,000 languages, but it is a speech encoder rather than a full transcription system, meaning it requires additional fine-tuning to be used for speech recognition. It also lacks a stable, easily accessible codebase, making it impractical to work with for this research. Omnilingual required significant effort to get running due to dependency issues and ultimately had to be cloned and run locally, referencing a [GitHub repo from Abu Anas Shuvom](https://github.com/xhuvom/omnilingual-ASR-Web-Dashboard) that helped address the compatibility issues. Whisper was by far the easiest to work with, but it would be useful to have easier access to the other models as well for better comparison.
+Working with some of the large multilingual ASR models proved difficult despite their claimed support for many languages. XEUS, for example, presents itself as covering over 4,000 languages, but it is a speech encoder rather than a full transcription system, meaning it requires additional fine-tuning to be used for speech recognition. It also lacks a stable, easily accessible codebase, making it impractical to work with for this research. The Omnilingual ASR model required significant effort to set up due to dependency issues, and I ultimately had to clone and run it locally, referencing a [GitHub repo from Abu Anas Shuvom](https://github.com/xhuvom/omnilingual-ASR-Web-Dashboard) that helped address compatibility issues. Whisper was by far the easiest to work with, but ideally all models would be simple to use, both for research comparison purposes and for the wider goal of making low-resource language models more accessible.
 
-A broader challenge was the lack of transparency and reproducibility across published ASR research. Papers do not always share how data was processed, what was included in training and validation sets, or what configuration choices were made, making comparisons difficult. The 680,000 hours of data used to train Whisper are not open source, so it is not possible to understand how this may have influenced performance on specific languages. This makes it harder to draw meaningful conclusions about why one model outperforms another on a given language.
+Another challenge was the lack of transparency and reproducibility across published ASR research. Papers do not always share how data was processed, what was included in training and validation sets, or what configuration choices were made, making comparisons difficult. The 680,000 hours of data used to train Whisper are not open source, so it is not possible to understand how this may have influenced performance on specific languages. This makes it harder to draw meaningful conclusions about why one model outperforms another on a given language.
+
+
 ## Future Work
 
 In future research, I would like to further investigate and experiment with Parameter-Efficient Fine-Tuning (PEFT), specifically Low-Rank Adaptation (LoRA). While LoRA made fine-tuning significantly faster and more efficient, I was unable to achieve better WER results compared to full fine-tuning. Some research I came across suggested that LoRA can help with overfitting and in some cases even improve performance. In my experiments, LoRA produced reasonable WER scores but still fell short of full fine-tuning. Testing different LoRA configurations could potentially yield better results, so this is something I would like to explore further.
 
 I would also like to further investigate audio chunking as a way to recover more training data. As mentioned previously, many of the segments in the Omnilingual dataset are longer than 30 seconds. I did some experimentation with splitting longer segments and attempting to realign them with the transcript, but this led to discrepancies between the audio and transcriptions. This would be worth revisiting given the potential to retain more data for training.
 
-Being able to further test the Minangkabau results is another future goal. With only about 30 minutes of single-speaker audio, it is unclear whether the model is overfitting to that specific speaker, context, and recording setup. While I did run a couple of informal tests on Minangkabau Wikitongues recordings and YouTube clips as a proof of concept and the transcriptions appeared accurate, this is not the same as a robust evaluation on a full and diverse speech dataset. Hopefully in the future more data will be available. 
+Being able to further test the Minangkabau results is another future goal. With only about 30 minutes of single-speaker audio, it is unclear whether the model is overfitting to that specific speaker, context, and recording setup. While I did run a couple of informal tests on Minangkabau Wikitongues recordings and YouTube clips as a proof of concept and the transcriptions appeared fairly accurate, this is not the same as evaluating on a full and diverse speech dataset. Hopefully in the future more data will be available. 
 
 Taking part in this research has given me the opportunity to work on a problem with real-world implications. The work I conducted will contribute to XRI's ongoing efforts to improve transcription capabilities for low-resource languages on XRIstudio.ai, helping to close the gap in transcription quality for speakers of underserved languages.
 
