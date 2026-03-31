@@ -56,7 +56,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .detail-hero.p2{background:#c8e6e2}
 .detail-hero h2{font-family:'Playfair Display',serif;font-size:30px;color:var(--teal-dark);font-weight:600;z-index:1}
 .detail-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(255,255,255,0.08),transparent 60%)}
-.detail-content{max-width:1200px}
+.detail-content{max-width:1200px;overflow-wrap:break-word;word-wrap:break-word}
 .detail-content h2{font-size:24px;font-weight:600;margin:36px 0 20px}
 .detail-content h3{font-size:20px;font-weight:600;margin:28px 0 20px}
 .detail-content h4{font-size:18px;font-weight:600;margin:24px 0 16px}
@@ -605,7 +605,7 @@ Using the methods described above, I was able to improve transcription accuracy 
 | **Speakers**                                                   | 5.3M                                                                                                                                                  | 4.7M                                                                                                                                                                                                                                                                                                                                             | 5.6M                                                                                                                                                                                                            | 4.7M          |
 | **Dataset**                                                    | Fleurs                                                                                                                                                | Omnilingual                                                                                                                                                                                                                                                                                                                                      | SEACrowd                                                                                                                                                                                                        | Omnilingual   |
 | **License**                                                    | CC-BY-4.0                                                                                                                                             | CC-BY-4.0                                                                                                                                                                                                                                                                                                                                        | Apache-2.0                                                                                                                                                                                                      | CC-BY-4.0     |
-| **Training Data**                                              | 16 hours                                                                                                                                             | 5 hours (filtered from 9 hrs)                                                                                                                                                                                                                                                                                                                   | 30 minutes                                                                                                                                                                                                     | 3.4 hours    |
+| **Training Data**                                              | 16 hours                                                                                                                                             | 5 hours                                                                                                                                                                                                                                                                                                                   | 30 minutes                                                                                                                                                                                                     | 3.4 hours    |
 | **Base Language used for Fine-Tuning**                         | Swahili                                                                                                                                               | Italian                                                                                                                                                                                                                                                                                                                                          | Malay                                                                                                                                                                                                           | Albanian      |
 | **Baseline Comparison WER**                                    | 123%                                                                                                                                                  | 75%                                                                                                                                                                                                                                                                                                                                              | 77%                                                                                                                                                                                                             | 97%           |
 | **Best Fine-Tuned WER training on Whisper Small**              | 52%                                                                                                                                                   | 35%                                                                                                                                                                                                                                                                                                                                              | 14%                                                                                                                                                                                                             | 49%           |
@@ -651,7 +651,7 @@ Islam, S. M. J. (2024). Quickstart finetuning large ASR models using LoRA. [http
 
 Liu, Y., et al. (2024). Exploration of Whisper fine-tuning strategies for low-resource ASR. [https://doi.org/10.1186/s13636-024-00349-3](https://doi.org/10.1186/s13636-024-00349-3)
 
-Prakash, S. (2024). LoRA for fine-tuning LLMs. [https://medium.com/@shwet.prakash97/lora-for-finetuning-llms-5810f7fab8a2](https://medium.com/@shwet.prakash97/lora-for-finetuning-llms-5810f7fab8a2)
+Prakash, S. (2024). LoRA for fine-tuning LLMs. [https://medium.com/@shwet.prakash97/lora-for-finetuning-llms-5810f7fab8a2](https://medium.com/@shwet.prakash97/lora-for-finetuning-llms-5810f7fab8a2)
 
 Pratap, V., et al. (2023). Scaling Speech Technology to 1,000+ Languages. [https://arxiv.org/pdf/2305.13516](https://arxiv.org/pdf/2305.13516)
 
@@ -928,20 +928,4 @@ Computational Thinking for Problem Solving</a></h4>
               <h4>Technology & Innovation Volunteer</h4>
               <div class="re-sub">Women in Localization</div>
               <div class="re-date">Jun 2025 &#8212; Present</div>
-              <p>Help with documentation, support, and strategic development for the organization's technology and software</p>
-            </div>
-            
-
-            
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-</body>
-</html>
+              <p>Help with documentation, support, and strategic development for the org
