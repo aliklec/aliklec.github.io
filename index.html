@@ -704,7 +704,13 @@ Sharma, A. K., et al. (2025). Fine-tuning Whisper Tiny for Swahili ASR: Challeng
 <!-- +++++++++++++++++++++++PROJECT 2 MD+++++++++++++++++++++++++++++++++ -->
 <script type="text/markdown" id="project2-md">
 
-## Task
+## Overview
+
+This is a description of the project I submitted for the Spring 2024 Statistical NLP Class Kaggle Competition at the University of Arizona. We were given a labeled training dataset with over 69,000 reviews and had to develop a model to correctly classify each review based on its sentiment and category. We ran our model against a masked test dataset, with the goal of achieving the highest F1 score.
+
+
+
+  ## Task
 <br />
 
 The dataset for this project contains reviews which fall into 3 categories:
@@ -713,7 +719,7 @@ The dataset for this project contains reviews which fall into 3 categories:
 - Positive movie or TV show review (label 1)
 - Negative movie or TV show review (label 2)
 
-There are two files in CSV format--one containing training data and one containing test data. The training file contains three columns: ID, review, and label. The test file contains two columns: ID and review.  The goal was to develop and train a classification model using the labeled data from the training file, in order to then accurately predict which of the three categories each test review should fall into.
+There are two files in CSV format, one containing training data (69,350 reviews) and one containing test data (17,441 reviews). The training file contains three columns: ID, review, and label. The test file contains two columns: ID and review.  The goal was to develop and train a classification model using the labeled data from the training file, in order to then accurately predict which of the three categories each test review should fall into.
 
 ## Approach
 <br />
@@ -735,7 +741,7 @@ For my first attempt, I created my own custom features and trained a logistic re
 }
 ```
 
-The goal was a customizable setup in which I could define and control the features precisely. However, based on my relatively small set of custom features in this draft setup, my initial Kaggle submission resulted in an accuracy score of around 77% percent. While I still think this approach could be promising with enough custom features, it would have been extremely time-consuming and manual. The training set has about 70,000 reviews, so coming up with a strong and comprehensive list of custom features to cover the many different ways of expressing sentiment would have been difficult. I still like the idea behind this approach, since it offers the ability to carefully control the features. If I were to continue with it, I would develop a larger set of features, and possibly consider alternatives like a count-based method instead of a binary one. However, I decided to shift gears and try a model involving less manual work.
+The goal was a customizable setup in which I could define and control the features precisely. However, based on my relatively small set of custom features in this draft setup, my initial Kaggle submission resulted in an accuracy score of around 77% percent. While I still think this approach could be promising with enough custom features, it would have been extremely time-consuming and manual. The training set has over 69,000 reviews, so coming up with a strong and comprehensive list of custom features to cover the many different ways of expressing sentiment would have been difficult. I still like the idea behind this approach, since it offers the ability to carefully control the features. If I were to continue with it, I would develop a larger set of features, and possibly consider alternatives like a count-based method instead of a binary one. However, I decided to shift gears and try a model involving less manual work.
 
 After considering more efficient methods to come up with features, I settled on using scikit-learn's TF-IDF vectorizer. This is a useful strategy for various reasons:
 
