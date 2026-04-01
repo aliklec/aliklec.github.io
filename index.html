@@ -348,7 +348,7 @@ Out of the least spoken 50 languages in the Ethnologue list, I identified severa
 - **Kamba** - [Google FLEURS](https://huggingface.co/datasets/google/fleurs)
 - **Minangkabau** - [SEACrowd Data Hub](https://github.com/SEACrowd)
 - **Sicilian** - [Meta Omnilingual ASR Corpus](https://huggingface.co/datasets/facebook/omnilingual-asr-corpus)
-- **Gheg** Albanian - [Meta Omnilingual ASR Corpus](https://huggingface.co/datasets/facebook/omnilingual-asr-corpus)
+- **Gheg Albanian** - [Meta Omnilingual ASR Corpus](https://huggingface.co/datasets/facebook/omnilingual-asr-corpus)
 
 I primarily worked with Whisper as the base model due to it having the best fine-tuning results, clearest recipes, and being most accessible, though I did experiment with other models.
 		
@@ -397,7 +397,7 @@ from datasets import Audio
 scn = scn.cast_column("audio", Audio(sampling_rate=16000))
 ```
 
-There were also decisions to make about text normalization, which can have a significant impact on WER calculations. To illustrate, computing WER for "`electronic engineer`" against "`Electronic engineer.`" returns a score of 1.0, a 100% error rate, because the capital letter and period cause the words to be treated as different. Although ASR systems that can accurately predict punctuation are useful, normalizing text is standard practice for WER evaluation. Both Whisper and MMS report normalized WER in their published results, and many datasets provide already-normalized transcriptions. For consistent comparison, I normalized the Sicilian data as well. Below is a sample transcript before and after applying the Whisper normalizer:"
+There were also decisions to make about text normalization, which can have a significant impact on WER calculations. To illustrate, computing WER for "`electronic engineer`" against "`Electronic engineer.`" returns a score of 1.0, a 100% error rate, because the capital letter and period cause the words to be treated as different. Although ASR systems that can accurately predict punctuation are useful, normalizing text is standard practice for WER evaluation. Both Whisper and MMS report normalized WER in their published results, and many datasets provide already-normalized transcriptions. For consistent comparison, I normalized the Sicilian data as well. Below is a sample transcript before and after applying the Whisper normalizer:
 
 ```
 from whisper_normalizer.basic import BasicTextNormalizer
