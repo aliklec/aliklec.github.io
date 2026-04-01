@@ -710,8 +710,7 @@ This is a description of the project I submitted for the Spring 2024 Statistical
 
 
 
-  ## Task
-<br />
+## Task
 
 The dataset for this project contains reviews which fall into 3 categories:
 
@@ -722,7 +721,6 @@ The dataset for this project contains reviews which fall into 3 categories:
 There are two files in CSV format, one containing training data (69,350 reviews) and one containing test data (17,441 reviews). The training file contains three columns: ID, review, and label. The test file contains two columns: ID and review.  The goal was to develop and train a classification model using the labeled data from the training file, in order to then accurately predict which of the three categories each test review should fall into.
 
 ## Approach
-<br />
 
 For my first attempt, I created my own custom features and trained a logistic regression model on them. First, I preprocessed the data by replacing NaN items with an empty string, removing certain punctuation I thought would not be relevant for sentiment, making everything lowercase, and getting rid of newline characters and HTML line break tags. Then I came up with some features I felt would signal the categories of the reviews. I used DictVectorizer to transform them into matrices, and then trained a logistic regression model on them. I created various custom features along these lines:
 
@@ -773,8 +771,6 @@ Here is the final approach I ended up with:
 <br />
 ## Results
 
-<br />
-
 With my final approach of TF-IDF for feature extraction, pruning with SelectKBest, and using logistic regression for training, I ended up with an F1 score of 0.9458 for my development data. This translated to a 0.92526 F1 score on Kaggle for the initial run with 80% of the test data, and it will be interesting to see how much it changes with the remaining 20% of the test data.
 
 The confusion matrix for my development data gave the following results:
@@ -793,8 +789,6 @@ F1 scores per class were as follows:
 <br />
 
 ## Code
-
-<br>
 
 The code is at the link here: [https://github.com/uazhlt-ms-program/grad-level-term-project-kaggle-competition-aliklec](https://github.com/uazhlt-ms-program/grad-level-term-project-kaggle-competition-aliklec)
 
@@ -819,7 +813,6 @@ The code was developed using the following versions:
 *Using a different version of Python or these libraries may change the code's behavior.
 
 ## Challenges/Ideas for Future Improvement
-<br>
 
 The review dataset presented many interesting challenges that could be explored further, and that my model did not address. As mentioned earlier, I couldn't determine why maintaining the "br" tags improved my model's accuracy, and I would like to understand this better. It was also a mystery to me why replacing terms like "movie", "film", and "flick" with a single, unified version decreased the accuracy. These are some patterns I would like to understand better. 
 
