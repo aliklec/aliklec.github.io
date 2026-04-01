@@ -126,8 +126,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .project-card{padding:24px}
 .project-body h3{font-size:17px}
 .project-body p{font-size:14px}
-.detail-hero{height:80px;border-radius:10px}
-.detail-hero h2{font-size:22px}
+.detail-hero{height:auto;min-height:70px;border-radius:10px;padding:16px 20px}
+.detail-hero h2{font-size:20px}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px}
+.table-scroll table{table-layout:auto}
 .detail-content h3{font-size:18px}
 .detail-content p{font-size:14.5px}
 .detail-content pre{padding:16px;font-size:12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -149,8 +151,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .tab{margin-right:24px;font-size:14px}
 .section-header h1{font-size:23px}
 .project-card{padding:20px}
-.detail-hero{height:70px}
-.detail-hero h2{font-size:20px}
+.detail-hero{min-height:60px;padding:14px 16px}
+.detail-hero h2{font-size:18px}
 .detail-content pre{padding:14px 12px;font-size:11.5px}
 .resume-grid{gap:24px}
 }
@@ -682,6 +684,17 @@ Sharma, A. K., et al. (2025). Fine-tuning Whisper Tiny for Swahili ASR: Challeng
           var key = td.textContent.trim();
           if (bullets[key]) td.innerHTML = bullets[key];
         });
+
+        // Wrap only the large Results table in scrollable div for mobile
+        document.querySelectorAll('.detail-content table').forEach(function(table) {
+          var cols = table.querySelector('tr') ? table.querySelector('tr').children.length : 0;
+          if (cols >= 5) {
+            var wrapper = document.createElement('div');
+            wrapper.className = 'table-scroll';
+            table.parentNode.insertBefore(wrapper, table);
+            wrapper.appendChild(table);
+          }
+        });
       }
     });
     </script>
@@ -706,7 +719,7 @@ Sharma, A. K., et al. (2025). Fine-tuning Whisper Tiny for Swahili ASR: Challeng
 
 ## Overview
 
-This is a description of the project I submitted for the Spring 2024 Statistical NLP Class Kaggle Competition at the University of Arizona. We were given a labeled training dataset with over 69,000 reviews and had to develop a model to correctly classify each review based on its sentiment and category. We ran our model against a masked test dataset, with the goal of achieving the highest F1 score.
+This is a description of the project I submitted for my Spring 2024 Statistical NLP Class Kaggle Competition at the University of Arizona. We were given a labeled training dataset with over 69,000 reviews and had to develop a model to correctly classify each review based on its sentiment and category. We ran our model against a masked test dataset, with the goal of achieving the highest F1 score.
 
 
 
@@ -916,17 +929,4 @@ Computational Thinking for Problem Solving</a></h4>
             </div>
           </div>
           <div class="resume-block">
-            <div class="resume-block-title">Skills</div>
-            <div class="resume-entry" style="padding-top:0;">
-              <p>Python, Machine Learning, Computational Linguistics</p>
-            </div>
-          </div>
-
-
-          <div class="resume-block">
-            <div class="resume-block-title">Volunteer Work</div>
-            <div class="resume-entry">
-              <h4>Technology & Innovation Volunteer</h4>
-              <div class="re-sub">Women in Localization</div>
-              <div class="re-date">Jun 2025 &#8212; Present</div>
-              <p>Help with documentation, support, and strategic devel
+            <div clas
