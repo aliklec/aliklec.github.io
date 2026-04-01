@@ -65,7 +65,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-pri)
 .detail-content ul{padding-left:20px;margin-bottom:16px}
 .detail-content li{font-size:15px;color:var(--text-sec);line-height:1.8}
 .detail-content pre{background:#e4e4e9;color:#111118;border-radius:10px;padding:20px 24px;margin:16px 0 20px;overflow-x:auto;font-size:13px;line-height:1.7;white-space:pre-wrap;word-wrap:break-word}
-.detail-content code{font-family:'DM Mono',monospace,Consolas,'Courier New';font-size:13px}
+.detail-content code{font-family:'DM Mono',monospace,Consolas,'Courier New';font-size:14px;background:#e4e4e9;padding:2px 6px;border-radius:4px}
+.detail-content pre code{font-size:13px;background:none;padding:0;border-radius:0}
 .detail-content pre .kw{color:#7c3aed}
 .detail-content pre .fn{color:#2563eb}
 .detail-content pre .st{color:#16a34a}
@@ -673,9 +674,9 @@ Sharma, A. K., et al. (2025). Fine-tuning Whisper Tiny for Swahili ASR: Challeng
         // Inject bullet lists into the Results table
         var bullets = {
           'BULLETS_KAMBA': '<ul><li>Whisper Medium (45% WER)</li><li>Whisper Large v3 + LoRA (77% WER)</li><li>Whisper Small with noise augmentation using audiomentations (53% WER)</li></ul>',
-          'BULLETS_SICILIAN': '<ul><li>Whisper Medium (6.14 CER) - achieved CER of 6.14 fine-tuning the Whisper Medium 769M parameter model, as compared to Omnilinguals\' reported Sicilian CER of 5.2 for a 7B parameter model.</li><li>Whisper Large + LoRA (11.91 CER)</li><li>Only 10 test items in original test set. Also ran test on larger dev set (187 items), resulting in 44% WER for Whisper Small vs 35% on test set</li></ul>',
+          'BULLETS_SICILIAN': '<ul><li>Whisper Medium (6.14 CER) - achieved CER of 6.14 fine-tuning the Whisper Medium 769M parameter model, as compared to Omnilinguals\' reported Sicilian CER of 5.2 for a 7B parameter model</li><li>Whisper Large + LoRA (11.91 CER)</li><li>Only 10 test items in original test set. Also ran test on larger dev set (187 items), resulting in 44% WER for Whisper Small vs 35% on test set.</li></ul>',
           'BULLETS_MINANGKABAU': '<ul><li>20-utterance single-speaker test set</li><li>Possible transfer learning from Malay</li><li>31.7% Out of Vocabulary rate</li><li>Generalizability may be limited due to the single-speaker setup and small dataset size</li></ul>',
-          'BULLETS_GHEG': '<ul><li>Whisper Medium (36% WER)</li></ul>'
+          'BULLETS_GHEG': '<ul><li>Whisper Medium (36% WER)</li><li>Likely benefited from cross-transfer learning from Albanian</li></ul>'
         };
         document.querySelectorAll('.detail-content td').forEach(function(td) {
           var key = td.textContent.trim();
@@ -929,4 +930,4 @@ Computational Thinking for Problem Solving</a></h4>
               <h4>Technology & Innovation Volunteer</h4>
               <div class="re-sub">Women in Localization</div>
               <div class="re-date">Jun 2025 &#8212; Present</div>
-              <p>Help with documentation, support, and strategic development for the org                       
+              <p>Help with documentation, support, and strategic devel
