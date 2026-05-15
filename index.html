@@ -268,7 +268,7 @@ window.addEventListener('load', function() {
 
             <p>From July 2025 to April 2026, I worked as a Machine Learning Intern at <a href="https://www.xriglobal.ai/">XRI Global</a>, focusing on data engineering and preprocessing, pipeline development, and fine-tuning automatic speech recognition models for low-resource languages. I explored methods including parameter-efficient fine-tuning with low-rank adaptation, and fine-tuned Whisper Small and Medium on languages including Gheg Albanian, Kamba, Minangkabau, and Sicilian, achieving significant improvements in word error rate. More details are on my <a href="https://aliklec.github.io/?page=portfolio">portfolio</a>.</p>
 
-            <p>I live in Tucson, Arizona with my partner and our two cats. I love to connect with other people working in machine learning and localization, and I'm open to new professional opportunities.</p>
+            <p>I live in Tucson, Arizona with my partner and our two cats. I love to connect with other people working in machine learning and localization, and I'm open to new professional opportunities. I'm especially interested in roles involving data engineering and model fine-tuning for domain-specific applications.</p>
           </div>
         </div>
       </div>
@@ -332,20 +332,23 @@ Speaker distribution across languages is heavily concentrated among the top lang
 
 The goal of my research project was to focus on the lowest-ranked languages within the top 200 to determine availability of open-source speech recognition models and datasets, and to fine-tune ASR models for those languages lacking dedicated, open-source speech recognition models.
 
+Throughout my internship, I developed core professional competencies through regular engagement with my supervisor and other stakeholders at XRI Global. I attended weekly progress meetings with my internship advisor, reported on my findings, and translated complex results into accessible summaries to meet organizational needs. Taking direction from XRI, I ensured my work remained aligned with company priorities and adapted my approach based on ongoing feedback. I also prepared clean, reproducible code, structured data spreadsheets, and concise written summaries intended for shared use, maintaining organized file systems on shared drives so that others could easily access and build on my contributions. These experiences strengthened my ability to collaborate effectively, respond to real-world constraints, and deliver professional work within an applied research setting.
+
+
 ## Initial Research on the ASR Landscape
 
 
-I started researching available ASR data and models by searching ACL Anthology, Hugging Face, Papers with Code, Github, and arXiv, and other sources. To keep track of my findings, I created a spreadsheet, reverse-ranking the Ethnologue 200, and added details for each language including dialects and alternate language names, ISO 639-3 code, available ASR models and data, licensing information, and whether large multilingual models like MMS, Whisper, and Xeus support the language.
+I started researching available ASR data and models by searching ACL Anthology, Hugging Face, Papers with Code, Github, arXiv, and other sources. To keep track of my findings, I created a spreadsheet, reverse-ranking the Ethnologue 200, and added details for each language including dialects and alternate language names, ISO 639-3 code, available ASR models and data, licensing information, and whether large multilingual models like MMS, Whisper, and Xeus support the language.
 
 
 ![Spreadsheet](https://aliklec.github.io/ASR-Spreadsheet.png)
 
 
-Several ASR models, such as MMS, Xeus, Omnilingual, and Whisper, claim broad language support, but this does not necessarily translate to strong performance on a given language or ease of use in practice. Xeus and Omnilingual proved difficult to run and use reliably (discussed further in the "Challenges" section), and OpenAI [reports](https://github.com/openai/whisper) WERs above 50% for Whisper Large on several languages, such Swahili and Albanian. While I still tracked large multilingual model support in the spreadsheet, it did not rule out the need for a fine-tuned model.
+Several ASR models, such as MMS, Xeus, Omnilingual, and Whisper, claim broad language support, but this does not necessarily translate to strong performance on a given language or ease of use in practice. Xeus and Omnilingual proved difficult to run and use reliably (discussed further in the "Challenges" section), and OpenAI [reports](https://github.com/openai/whisper) WERs above 50% for Whisper Large on several languages, such as Swahili and Albanian. While I still tracked large multilingual model support in the spreadsheet, it did not rule out the need for a fine-tuned model.
 
 In terms of data, I listed everything I came across, but the aim was to find data with open licenses such as [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/deed.en) or [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) to be used for fine-tuning.
 
-I also researched options for testing and benchmarking ASR models, as well as recipes for fine-tuning on speech data. One helpful resource was Hugging Face's 2022 [Whisper Fine Tuning Event](https://github.com/huggingface/community-events/tree/main/whisper-fine-tuning-event) documentation and [fine-tuning guide](https://huggingface.co/blog/fine-tune-whisper). For MMS, [Fine-tuning MMS Adapter Models for Multi-Lingual ASR](https://huggingface.co/blog/mms_adapters) was another useful reference.
+I also researched options for testing and benchmarking ASR models, as well as recipes for fine-tuning on speech data. One helpful resource was Hugging Face's 2022 [Whisper Fine-Tuning Event](https://github.com/huggingface/community-events/tree/main/whisper-fine-tuning-event) documentation and [fine-tuning guide](https://huggingface.co/blog/fine-tune-whisper). For MMS, [Fine-tuning MMS Adapter Models for Multi-Lingual ASR](https://huggingface.co/blog/mms_adapters) was another useful reference.
 
 Out of the least spoken 50 languages in the Ethnologue list, I identified several with open source datasets that did not have dedicated, open source ASR models, meeting the criteria for fine-tuning candidates. The following are the languages and datasets I chose to focus on:
 - **Kamba** - [Google FLEURS](https://huggingface.co/datasets/google/fleurs)
@@ -770,9 +773,9 @@ Another thing I noticed while testing my model, was that the unigram and bigram 
 
 After settling on the scikit-learn preprocessing defaults, the next step was fine-tune the parameters to see how much I could improve my accuracy and found that an efficient way to do this would be to use scikit-learn's [GridSearchCV](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html) method (explained further [here](https://www.analyticsvidhya.com/blog/2021/06/tune-hyperparameters-with-gridsearchcv/#h-what-is-gridsearchcv)). This presented some new challenges because many combinations of parameters were not feasible to test in a reasonable amount of time. However, it proved to be useful overall if I limited my search to just a few select parameter comparisons.
 
-After a lot of experimenting, I started to zero in on some effective parameters. For TF-IDF, I found that a minimum document frequency of 3 and a maximum document frequency of 70% worked well. Limiting the most rare and most common ngrams seemed to help the model focus on what was important. Logarithmic scaling with "sublinear_tf=True" improved the model, as did lowercasing, using a binary representation, and leaving the default L2 norm. With respect to ngrams, I found that ranges between 1-3 and 1-5 were most accurate for my model. Smaller ranges likely did not capture enough complexity and larger ranges probably led to overfitting. For logistic regression parameters, I found that regularization with a C value between 5 to 20 worked best (depending on other various parameters). It was interesting to see how changing the C value impacted the training and development accuracy. Increasing C gave me increasingly good accuracy results for the training data, but at a certain point the development data would stop improving, signaling that the model was overfitting. Through various adjustments and testing with GridSearchCV, I also found that the Stochastic Average Gradient Augmented ('saga') solver, a balanced class weight, and the default L2 penalty worked well for my model.
+After a lot of experimenting, I started to zero in on some effective parameters. For TF-IDF, I found that a minimum document frequency of 3 and a maximum document frequency of 70% worked well. Limiting the most rare and most common ngrams seemed to help the model focus on what was important. Logarithmic scaling with "sublinear_tf=True" improved the model, as did lowercasing, using a binary representation, and leaving the default L2 norm. With respect to ngrams, I found that ranges between 1-3 and 1-5 were most accurate for my model. Smaller ranges likely did not capture enough complexity and larger ranges probably led to overfitting. For logistic regression parameters, I found that regularization with a C value between 5 and 20 worked best (depending on other various parameters). It was interesting to see how changing the C value impacted the training and development accuracy. Increasing C gave me increasingly good accuracy results for the training data, but at a certain point the development data would stop improving, signaling that the model was overfitting. Through various adjustments and testing with GridSearchCV, I also found that the Stochastic Average Gradient Augmented ('saga') solver, a balanced class weight, and the default L2 penalty worked well for my model.
 
-After I felt I had reached a peak in terms of significant F1 improvements from adjusting TF-IDF and logistic regression parameters, I was curious about what other methods could improve my score. In researching techniques, I came across scikit-learn's "[SelectKBest](https://scikit-learn.org/stable/modules/feature_selection.html#univariate-feature-selection)" method (discussed further [here](https://medium.com/@Kavya2099/optimizing-performance-selectkbest-for-efficient-feature-selection-in-machine-learning-3b635905ed48#098d)) . Using statistical tests to measure dependence between variables (i.e. features as independent variables and classes as dependent variables), SelectKBest can help identify the most relevant features from the data, which can improve the performance of the model and reduce overfitting. My TF-IDF model with 1-5 ngrams originally contained 1,050,400 features! After playing around with different K values using the chi-squared test, I found that 215,000 seemed to be the sweet spot for improving my F1 score. With SelectKBest implemented, I was able to get an F1 score around 0.9458 for my development data. While it felt like I could have fiddled around endlessly, testing more feature extraction methods, training techniques, and parameters, I decided this F1 score was satisfactory.
+After I felt I had reached a peak in terms of significant F1 improvements from adjusting TF-IDF and logistic regression parameters, I was curious about what other methods could improve my score. In researching techniques, I came across scikit-learn's "[SelectKBest](https://scikit-learn.org/stable/modules/feature_selection.html#univariate-feature-selection)" method (discussed further [here](https://medium.com/@Kavya2099/optimizing-performance-selectkbest-for-efficient-feature-selection-in-machine-learning-3b635905ed48#098d)). Using statistical tests to measure dependence between variables (i.e. features as independent variables and classes as dependent variables), SelectKBest can help identify the most relevant features from the data, which can improve the performance of the model and reduce overfitting. My TF-IDF model with 1-5 ngrams originally contained 1,050,400 features! After playing around with different K values using the chi-squared test, I found that 215,000 seemed to be the sweet spot for improving my F1 score. With SelectKBest implemented, I was able to get an F1 score around 0.9458 for my development data. While it felt like I could have fiddled around endlessly, testing more feature extraction methods, training techniques, and parameters, I decided this F1 score was satisfactory.
 
 Here is the final approach I ended up with:
 - Load the data using Pandas and replace missing values with an empty string using the "fillna" function
@@ -829,7 +832,7 @@ The code was developed using the following versions:
 
 The review dataset presented many interesting challenges that could be explored further, and that my model did not address. As mentioned earlier, I couldn't determine why maintaining the "br" tags improved my model's accuracy, and I would like to understand this better. It was also a mystery to me why replacing terms like "movie", "film", and "flick" with a single, unified version decreased the accuracy. These are some patterns I would like to understand better. 
 
-I would also like to investigate other preprocessing steps and how they could impact the results. For example, many of the reviews had typos or informal spellings that could confuse the analysis. Some examples from the data are things like "surprized" and "MOVIE SUUUUUUUUUUUUCKS"---ideally these would be normalized to "surprised" and "movie sucks" to enhance feature alignment. Another interesting aspect of the data was the inclusion of languages other than English. This may have added variability and confusion to the dataset. Nonetheless, the TF-IDF model seems capable of handling multiple languages to some extent. For instance, when examining the top features, I noticed some Chinese characters, indicating that the TF-IDF model might have identified important terms from non-English reviews that suggest specific categories. However, these non-English reviews were a smaller part of the dataset and may not have constituted enough data for the model to pick up on many useful patterns. Ideally, for future improvements of the classifier, all reviews would be translated into English during preprocessing to standardize the data.
+I would also like to investigate other preprocessing steps and how they could impact the results. For example, many of the reviews had typos or informal spellings that could confuse the analysis. Some examples from the data are things like "surprized" and "MOVIE SUUUUUUUUUUUUCKS"---ideally these would be normalized to "surprised" and "movie sucks" to enhance feature alignment. Another interesting aspect of the data was the inclusion of languages other than English. This may have added variability and confusion to the dataset. Nonetheless, the TF-IDF model seems capable of handling multiple languages to some extent. For instance, when examining the top features, I noticed some Chinese characters, indicating that the TF-IDF model might have identified important terms from non-English text. However, these non-English texts were a smaller part of the dataset and may not have constituted enough data for the model to pick up on many useful patterns. Ideally, for future improvements of the classifier, all text would be translated into English during preprocessing to standardize the data.
 
 Another challenge highlighted by the confusion matrix was the model mistaking positive reviews for negative ones, and vice versa. In reviewing the top coefficients, common terms such as "film" and "movie" were identified as key features for both classes, which likely led to mislabeling. A potentially better approach could be two-stage classification: initially, the model would be trained to differentiate between TV/movie reviews and non-TV/movie reviews. Once TV/movie reviews are isolated, the model could then focus on classifying them as positive or negative. This method could also address situations such as the word "worst" being strongly associated with negative reviews during training, which might tip the classification of a non-TV/movie review into the negative category.
 
@@ -916,6 +919,9 @@ There were many examples like this of reviewers using sarcasm or expressing both
               <div class="re-date">2010</div>
             </div>
           </div>
+
+
+
           <div class="resume-block">
             <div class="resume-block-title">Certifications</div>
             <div class="resume-entry">
@@ -928,5 +934,25 @@ Computational Thinking for Problem Solving</a></h4>
               <div class="re-date">2020</div>
             </div>
           </div>
+
+          <div class="resume-block">
+            <div class="resume-block-title">Skills</div>
+            <div class="resume-entry" style="padding-top:0;">
+              <ul style="margin:0;padding-left:1.2em;line-height:1.8;">
+                <li>Spanish (Professional Working Proficiency)</li>
+                <li>Python</li>
+                <li>SQL</li>
+                <li>NLTK</li>
+                <li>spaCy</li>
+                <li>scikit-learn</li>
+                <li>NumPy</li>
+                <li>Pandas</li>
+                <li>Jupyter</li>
+                <li>Data Engineering</li>
+                <li>Text Classification</li>
+              </ul>
+            </div>
+          </div>  
+
           <div class="resume-block">
             <div clas
